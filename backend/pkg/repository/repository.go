@@ -11,6 +11,7 @@ type Authorization interface {
 }
 
 type Thought interface {
+	Test() (interface{}, error)
 }
 
 func NewRepository(db *sqlx.DB) *Repository {

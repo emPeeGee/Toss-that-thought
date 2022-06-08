@@ -11,6 +11,7 @@ import (
 	"github.com/emPeeee/ttt/pkg/repository"
 	"github.com/emPeeee/ttt/pkg/service"
 	"github.com/joho/godotenv"
+	_ "github.com/lib/pq"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
@@ -28,22 +29,22 @@ func main() {
 		logrus.Fatalf("Error loading env variables: %s", err.Error())
 	}
 
-	//db, err := repository.NewPostgresDB(repository.Config{
-	//	Host:     viper.GetString("db.host"),
-	//	Port:     viper.GetString("db.port"),
-	//	Username: viper.GetString("db.username"),
-	//	DBName:   viper.GetString("db.dbname"),
-	//	SSLMode:  viper.GetString("db.sslmode"),
-	//	Password: os.Getenv("DB_PASSWORD"),
-	//})
+	db, err := repository.NewPostgresDB(repository.Config{
+		Host:     viper.GetString("db.host"),
+		Port:     viper.GetString("db.port"),
+		Username: viper.GetString("db.username"),
+		DBName:   viper.GetString("db.dbname"),
+		SSLMode:  viper.GetString("db.sslmode"),
+		Password: os.Getenv("DB_PASSWORD"),
+	})
 
-	//if err != nil {
-	//	logrus.Fatalf("failed to initialize db: %s", err.Error())
-	//}
+	if err != nil {
+		logrus.Fatalf("failed to initialize db: %s", err.Error())
+	}
 
 	server := new(ttt.Server)
 
-	repositories := repository.NewRepository(nil)
+	repositories := repository.NewRepository(db)
 	services := service.NewService(repositories)
 	handlers := handler.NewHandler(services)
 
@@ -65,9 +66,9 @@ func main() {
 		logrus.Fatalf("error occurred on server shutting down: %s", err.Error())
 	}
 
-	//if err := db.Close(); err != nil {
-	//	logrus.Fatalf("error occurred on db connection close: %s", err.Error())
-	//}
+	if err := db.Close(); err != nil {
+		logrus.Fatalf("error occurred on db connection close: %s", err.Error())
+	}
 }
 
 func initializeConfig() error {

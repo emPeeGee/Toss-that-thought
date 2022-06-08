@@ -9,3 +9,7 @@ type ThoughtService struct {
 func NewThoughtService(repo repository.Thought) *ThoughtService {
 	return &ThoughtService{repo: repo}
 }
+
+func (s *ThoughtService) Test() (interface{}, error) {
+	return s.repo.Test()
+}

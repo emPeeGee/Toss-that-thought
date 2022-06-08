@@ -18,4 +18,5 @@ type Authorization interface {
 }
 
 type Thought interface {
+	Test() (interface{}, error)
 }
