@@ -33,3 +33,12 @@ func (r *ThoughtSql) Create(input entity.ThoughtInput) (entity.ThoughtResponse, 
 
 	return thoughtResponse, nil
 }
+
+func (r *ThoughtSql) Metadata(metadataKey string) (entity.ThoughtMetadataResponse, error) {
+	var thoughtMetadata entity.ThoughtMetadataResponse
+
+	thoughtMetadataQuery := "SELECT th.lifetime, th.is_burned, th.created_date, th.thought_key FROM thoughts th WHERE th.metadata_key = $1"
+	err := r.db.Get(&thoughtMetadata, thoughtMetadataQuery, metadataKey)
+
+	return thoughtMetadata, err
+}

@@ -20,3 +20,7 @@ func (s *ThoughtService) Test() (interface{}, error) {
 func (s *ThoughtService) Create(input entity.ThoughtInput) (entity.ThoughtResponse, error) {
 	return s.repo.Create(input)
 }
+
+func (s *ThoughtService) Metadata(metadataKey string) (entity.ThoughtMetadataResponse, error) {
+	return s.repo.Metadata(metadataKey)
+}

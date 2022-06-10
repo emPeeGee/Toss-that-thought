@@ -16,6 +16,7 @@ type Authorization interface {
 type Thought interface {
 	Test() (interface{}, error)
 	Create(input entity.ThoughtInput) (entity.ThoughtResponse, error)
+	Metadata(metadataKey string) (entity.ThoughtMetadataResponse, error)
 }
 
 func NewRepository(db *sqlx.DB) *Repository {

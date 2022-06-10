@@ -22,6 +22,7 @@ func (h *Handler) InitializeRoutes() *gin.Engine {
 	{
 		api.GET("/", h.test)
 		api.POST("/create", h.Create)
+		api.GET("/metadata/:id", h.Metadata)
 	}
 
 	return router

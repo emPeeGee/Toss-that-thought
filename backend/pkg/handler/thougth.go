@@ -52,3 +52,18 @@ func (h *Handler) Create(c *gin.Context) {
 
 	c.JSON(http.StatusOK, thoughtMetadata)
 }
+
+func (h *Handler) Metadata(c *gin.Context) {
+	metadataKey := c.Param("id")
+
+	thoughtMetadata, err := h.services.Thought.Metadata(metadataKey)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, map[string]interface{}{
+			"message": "SQL error",
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, thoughtMetadata)
+}
