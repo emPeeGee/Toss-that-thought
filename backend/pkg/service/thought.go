@@ -1,6 +1,9 @@
 package service
 
-import "github.com/emPeeee/ttt/pkg/repository"
+import (
+	"github.com/emPeeee/ttt/pkg/entity"
+	"github.com/emPeeee/ttt/pkg/repository"
+)
 
 type ThoughtService struct {
 	repo repository.Thought
@@ -12,4 +15,8 @@ func NewThoughtService(repo repository.Thought) *ThoughtService {
 
 func (s *ThoughtService) Test() (interface{}, error) {
 	return s.repo.Test()
+}
+
+func (s *ThoughtService) Create(input entity.ThoughtInput) (entity.ThoughtResponse, error) {
+	return s.repo.Create(input)
 }

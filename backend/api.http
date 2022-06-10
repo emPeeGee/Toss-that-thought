@@ -1,0 +1,17 @@
+### Valid Create request
+POST http://localhost:9000/api/create
+Content-Type: application/json
+
+{
+  "passphrase": "Secret Santa is here",
+  "lifetime": "2006-01-02T15:04:05Z"
+}
+
+### Invalid Create request
+POST http://localhost:9000/api/create
+Content-Type: application/json
+
+{
+  "passphrase": "",
+  "lifetime": "2006-01-02T15:04:05Z"
+}

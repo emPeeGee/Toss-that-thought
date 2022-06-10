@@ -1,6 +1,9 @@
 package service
 
-import "github.com/emPeeee/ttt/pkg/repository"
+import (
+	"github.com/emPeeee/ttt/pkg/entity"
+	"github.com/emPeeee/ttt/pkg/repository"
+)
 
 type Service struct {
 	Authorization
@@ -19,4 +22,5 @@ type Authorization interface {
 
 type Thought interface {
 	Test() (interface{}, error)
+	Create(entity.ThoughtInput) (entity.ThoughtResponse, error)
 }

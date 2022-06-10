@@ -21,3 +21,34 @@ func (h *Handler) test(c *gin.Context) {
 
 	c.JSON(http.StatusOK, getAllThoughtsResponse{Data: thoughts.([]entity.Thought)})
 }
+
+func (h *Handler) Create(c *gin.Context) {
+	var input entity.ThoughtInput
+
+	if err := c.BindJSON(&input); err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, map[string]interface{}{
+			"message": "Incorrect input",
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	if err := h.validate.Struct(input); err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, map[string]interface{}{
+			"message": "Validation",
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	thoughtMetadata, err := h.services.Thought.Create(input)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, map[string]interface{}{
+			"message": "Incorrect server",
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, thoughtMetadata)
+}

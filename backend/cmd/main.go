@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"github.com/go-playground/validator/v10"
 	"os"
 	"os/signal"
 	"syscall"
@@ -44,9 +45,10 @@ func main() {
 
 	server := new(ttt.Server)
 
+	v := validator.New()
 	repositories := repository.NewRepository(db)
 	services := service.NewService(repositories)
-	handlers := handler.NewHandler(services)
+	handlers := handler.NewHandler(services, v)
 
 	go func() {
 		if err := server.Run(viper.GetString("port"), handlers.InitializeRoutes()); err != nil {
