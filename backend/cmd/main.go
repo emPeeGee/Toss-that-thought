@@ -17,6 +17,7 @@ import (
 	"github.com/spf13/viper"
 )
 
+// TODO: LOG every request
 func main() {
 	logrus.SetFormatter(&logrus.TextFormatter{
 		FullTimestamp: true,

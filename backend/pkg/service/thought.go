@@ -17,7 +17,7 @@ func (s *ThoughtService) Test() (interface{}, error) {
 	return s.repo.Test()
 }
 
-func (s *ThoughtService) Create(input entity.ThoughtInput) (entity.ThoughtResponse, error) {
+func (s *ThoughtService) Create(input entity.ThoughtInput) (entity.ThoughtCreateResponse, error) {
 	return s.repo.Create(input)
 }
 

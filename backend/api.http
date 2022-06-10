@@ -3,6 +3,7 @@ POST http://localhost:9000/api/create
 Content-Type: application/json
 
 {
+  "thought": "Hello, Cousin",
   "passphrase": "Secret Santa is here",
   "lifetime": "2006-01-02T15:04:05Z"
 }
@@ -12,12 +13,13 @@ POST http://localhost:9000/api/create
 Content-Type: application/json
 
 {
+  "thought": "Hey",
   "passphrase": "",
   "lifetime": "2006-01-02T15:04:05Z"
 }
 
 ### GET Metadata request
-GET http://localhost:9000/api/metadata/aa352188-cb23-470e-9ba9-21ab0334192d
+GET http://localhost:9000/api/metadata/a4dfe246-02d2-493d-81f8-26edb6b11787
 
 ### Invalid GET Metadata request
 GET http://localhost:9000/api/metadata/fda

@@ -22,10 +22,10 @@ func (r *ThoughtSql) Test() (interface{}, error) {
 	return thoughts, err
 }
 
-func (r *ThoughtSql) Create(input entity.ThoughtInput) (entity.ThoughtResponse, error) {
-	var thoughtResponse entity.ThoughtResponse
-	createThoughtQuery := `INSERT INTO thoughts(passphrase, lifetime) VALUES ($1, $2) RETURNING metadata_key;`
-	row := r.db.QueryRowx(createThoughtQuery, input.Passphrase, input.Lifetime)
+func (r *ThoughtSql) Create(input entity.ThoughtInput) (entity.ThoughtCreateResponse, error) {
+	var thoughtResponse entity.ThoughtCreateResponse
+	createThoughtQuery := `INSERT INTO thoughts(thought, passphrase, lifetime) VALUES ($1, $2, $3) RETURNING metadata_key;`
+	row := r.db.QueryRowx(createThoughtQuery, input.Thought, input.Passphrase, input.Lifetime)
 
 	if err := row.StructScan(&thoughtResponse); err != nil {
 		return thoughtResponse, err
