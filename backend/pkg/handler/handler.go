@@ -23,6 +23,7 @@ func (h *Handler) InitializeRoutes() *gin.Engine {
 		api.GET("/", h.test)
 		api.POST("/create", h.Create)
 		api.GET("/metadata/:id", h.Metadata)
+		api.GET("/thought/:id", h.ThoughtExists)
 	}
 
 	return router

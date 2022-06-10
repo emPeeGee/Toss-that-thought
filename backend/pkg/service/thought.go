@@ -24,3 +24,7 @@ func (s *ThoughtService) Create(input entity.ThoughtInput) (entity.ThoughtCreate
 func (s *ThoughtService) Metadata(metadataKey string) (entity.ThoughtMetadataResponse, error) {
 	return s.repo.Metadata(metadataKey)
 }
+
+func (s *ThoughtService) CheckThoughtExists(thoughtKey string) (bool, error) {
+	return s.repo.CheckThoughtExists(thoughtKey)
+}

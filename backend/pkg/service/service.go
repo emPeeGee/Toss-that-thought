@@ -24,4 +24,5 @@ type Thought interface {
 	Test() (interface{}, error)
 	Create(entity.ThoughtInput) (entity.ThoughtCreateResponse, error)
 	Metadata(metadataKey string) (entity.ThoughtMetadataResponse, error)
+	CheckThoughtExists(thoughtKey string) (bool, error)
 }

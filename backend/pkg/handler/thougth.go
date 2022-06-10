@@ -67,3 +67,22 @@ func (h *Handler) Metadata(c *gin.Context) {
 
 	c.JSON(http.StatusOK, thoughtMetadata)
 }
+
+// ThoughtExists I don't really like this name
+// But i frontend I should say that thought does not exist or is burned
+func (h *Handler) ThoughtExists(c *gin.Context) {
+	thoughtKey := c.Param("id")
+
+	exists, err := h.services.Thought.CheckThoughtExists(thoughtKey)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, map[string]interface{}{
+			"message": "Such thought does not exists",
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, map[string]interface{}{
+		"ok": exists,
+	})
+}

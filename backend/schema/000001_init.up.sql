@@ -1,9 +1,9 @@
 CREATE
 EXTENSION IF NOT EXISTS "uuid-ossp";
 
-DROP TABLE users_thoughts;
-DROP TABLE users;
-DROP TABLE thoughts;
+-- DROP TABLE users_thoughts;
+-- DROP TABLE users;
+-- DROP TABLE thoughts;
 
 CREATE TABLE users
 (

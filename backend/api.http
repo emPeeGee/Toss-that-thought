@@ -24,4 +24,10 @@ GET http://localhost:9000/api/metadata/a4dfe246-02d2-493d-81f8-26edb6b11787
 ### Invalid GET Metadata request
 GET http://localhost:9000/api/metadata/fda
 
+### GET CheckThoughtExists request
+GET http://localhost:9000/api/thought/52349050-3620-4ea0-921d-0e21ecac72ee
+
+### Invalid GET CheckThoughtExists request
+GET http://localhost:9000/api/thought/fda
+
 # TODO: Currently here I use hardcoded values

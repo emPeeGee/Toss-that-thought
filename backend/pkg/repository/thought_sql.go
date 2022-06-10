@@ -42,3 +42,16 @@ func (r *ThoughtSql) Metadata(metadataKey string) (entity.ThoughtMetadataRespons
 
 	return thoughtMetadata, err
 }
+
+func (r *ThoughtSql) CheckThoughtExists(thoughtKey string) (bool, error) {
+	var exists bool
+	query := "SELECT exists(SELECT th.id FROM thoughts th WHERE th.thought_key = $1);"
+	row := r.db.QueryRow(query, thoughtKey)
+
+	err := row.Scan(&exists)
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
+}
