@@ -3,8 +3,8 @@ POST http://localhost:9000/api/create
 Content-Type: application/json
 
 {
-  "thought": "Hello, Cousin",
-  "passphrase": "Secret Santa is here",
+  "thought": "Hello, Cousin, v2",
+  "passphrase": "1121",
   "lifetime": "2006-01-02T15:04:05Z"
 }
 
@@ -30,4 +30,29 @@ GET http://localhost:9000/api/thought/52349050-3620-4ea0-921d-0e21ecac72ee
 ### Invalid GET CheckThoughtExists request
 GET http://localhost:9000/api/thought/fda
 
-# TODO: Currently here I use hardcoded values
+
+### Access thought request
+POST http://localhost:9000/api/thought/a986ae4e-400e-475f-9b04-3611c1af258a
+Content-Type: application/json
+
+{
+  "passphrase": "1121"
+}
+
+### Invalid Access thought request with incorrent password
+POST http://localhost:9000/api/thought/ed94cb6c-f02b-489d-9156-6ee9f0e20e41
+Content-Type: application/json
+
+{
+  "passphrase": "lo"
+}
+
+### Invalid Access thought request with incorrent thoughtKey
+POST http://localhost:9000/api/thought/7c6e0835
+Content-Type: application/json
+
+{
+  "passphrase": "hello"
+}
+
+### TODO: Currently here I use hardcoded values

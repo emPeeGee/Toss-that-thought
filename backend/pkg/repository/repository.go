@@ -18,6 +18,8 @@ type Thought interface {
 	Create(input entity.ThoughtInput) (entity.ThoughtCreateResponse, error)
 	Metadata(metadataKey string) (entity.ThoughtMetadataResponse, error)
 	CheckThoughtExists(thoughtKey string) (bool, error)
+	AccessThought(thoughtKey, passphrase string) (entity.AccessThoughtResponse, error)
+	GetPassphraseOfThought(thoughtKey string) (string, error)
 }
 
 func NewRepository(db *sqlx.DB) *Repository {

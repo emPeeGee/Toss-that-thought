@@ -10,6 +10,14 @@ type ThoughtInput struct {
 	Lifetime   time.Time `json:"lifetime" db:"lifetime" validate:"required"`
 }
 
+type AccessThoughtInput struct {
+	Passphrase string `json:"passphrase" validate:"required,max=255"`
+}
+
+type AccessThoughtResponse struct {
+	Thought string `json:"thought" db:"thought"`
+}
+
 type ThoughtCreateResponse struct {
 	MetadataKey string `json:"metadataKey" db:"metadata_key"`
 }
@@ -26,6 +34,7 @@ type ThoughtResponse struct {
 }
 
 // TODO: To implement Status table, with id, status, and time when status was changed
+// TODO: Passphrase should be encrypted
 type Thought struct {
 	Id           int       `json:"id" db:"id"`
 	Thought      string    `json:"thought" db:"thought" validate:"required"`

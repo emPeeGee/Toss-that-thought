@@ -86,3 +86,37 @@ func (h *Handler) ThoughtExists(c *gin.Context) {
 		"ok": exists,
 	})
 }
+
+func (h *Handler) AccessThought(c *gin.Context) {
+	thoughtKey := c.Param("id")
+
+	exists, err := h.services.Thought.CheckThoughtExists(thoughtKey)
+	if err != nil || !exists {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, map[string]interface{}{
+			"message": "Such thought does not exists",
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	var accessThoughtInput entity.AccessThoughtInput
+	if err := c.BindJSON(&accessThoughtInput); err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, map[string]interface{}{
+			"message": "Such thought does not exists",
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	accessThoughtResponse, err := h.services.Thought.AccessThought(thoughtKey, accessThoughtInput.Passphrase)
+
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, map[string]interface{}{
+			"message": "Incorrect password",
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, accessThoughtResponse)
+}
