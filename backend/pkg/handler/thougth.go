@@ -71,7 +71,7 @@ func (h *Handler) ThoughtExists(c *gin.Context) {
 	})
 }
 
-func (h *Handler) AccessThought(c *gin.Context) {
+func (h *Handler) ShowThought(c *gin.Context) {
 	thoughtKey := c.Param("id")
 
 	exists, err := h.services.Thought.CheckThoughtExists(thoughtKey)
@@ -92,7 +92,7 @@ func (h *Handler) AccessThought(c *gin.Context) {
 		return
 	}
 
-	accessThoughtResponse, err := h.services.Thought.AccessThought(thoughtKey, accessThoughtInput.Passphrase)
+	accessThoughtResponse, err := h.services.Thought.ShowThought(thoughtKey, accessThoughtInput.Passphrase)
 
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, map[string]interface{}{
@@ -103,4 +103,40 @@ func (h *Handler) AccessThought(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, accessThoughtResponse)
+}
+
+// Dublicated code with checking thought if exists
+func (h *Handler) BurnThought(c *gin.Context) {
+	thoughtKey := c.Param("id")
+
+	exists, err := h.services.Thought.CheckThoughtExists(thoughtKey)
+	if err != nil || !exists {
+		c.AbortWithStatusJSON(http.StatusBadRequest, map[string]interface{}{
+			"message": "Such thought does not exists",
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	var accessThoughtInput entity.AccessThoughtInput
+	if err := c.BindJSON(&accessThoughtInput); err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, map[string]interface{}{
+			"message": "Incorrect body",
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	ok, err := h.services.Thought.BurnThought(thoughtKey, accessThoughtInput.Passphrase)
+	if err != nil || !ok {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, map[string]interface{}{
+			"message": "Passphrase is incorrect",
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, map[string]interface{}{
+		"ok": "ok",
+	})
 }

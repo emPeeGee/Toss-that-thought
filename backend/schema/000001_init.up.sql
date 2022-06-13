@@ -1,9 +1,9 @@
 CREATE
 EXTENSION IF NOT EXISTS "uuid-ossp";
 
--- DROP TABLE users_thoughts;
--- DROP TABLE users;
--- DROP TABLE thoughts;
+DROP TABLE users_thoughts;
+DROP TABLE users;
+DROP TABLE thoughts;
 
 CREATE TABLE users
 (
@@ -23,7 +23,7 @@ CREATE TABLE thoughts
     lifetime      TIMESTAMP    NOT NULL,
     created_date  TIMESTAMP DEFAULT current_timestamp,
     is_burned     BOOL      DEFAULT FALSE,
-    time_accessed TIMESTAMP DEFAULT NULL,
+    burned_date   TIMESTAMP DEFAULT NULL,
     metadata_key  UUID      default uuid_generate_v4(),
     thought_key   uuid      default uuid_generate_v4()
 );

@@ -34,7 +34,7 @@ func (s *ThoughtService) CheckThoughtExists(thoughtKey string) (bool, error) {
 	return s.repo.CheckThoughtExists(thoughtKey)
 }
 
-func (s *ThoughtService) AccessThought(thoughtKey, passphrase string) (entity.AccessThoughtResponse, error) {
+func (s *ThoughtService) ShowThought(thoughtKey, passphrase string) (entity.AccessThoughtResponse, error) {
 	hashedPassphrase, err := s.repo.GetPassphraseOfThought(thoughtKey)
 	if err != nil {
 		return entity.AccessThoughtResponse{}, err
@@ -44,7 +44,20 @@ func (s *ThoughtService) AccessThought(thoughtKey, passphrase string) (entity.Ac
 		return entity.AccessThoughtResponse{}, errors.New("password does not match")
 	}
 
-	return s.repo.AccessThought(thoughtKey, hashedPassphrase)
+	return s.repo.ShowThought(thoughtKey, hashedPassphrase)
+}
+
+func (s *ThoughtService) BurnThought(thoughtKey, passphrase string) (bool, error) {
+	hashedPassphrase, err := s.repo.GetPassphraseOfThought(thoughtKey)
+	if err != nil {
+		return false, err
+	}
+
+	if CheckPasswordHashes(passphrase, hashedPassphrase) == false {
+		return false, errors.New("password does not match")
+	}
+
+	return s.repo.BurnThought(thoughtKey, hashedPassphrase)
 }
 
 func HashPassphrase(passphrase string) (string, error) {

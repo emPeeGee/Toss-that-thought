@@ -55,4 +55,12 @@ Content-Type: application/json
   "passphrase": "hello"
 }
 
+### Burn thought request
+POST http://localhost:9000/api/thought/14ccc936-3832-4d9f-90c1-0159ec3223ef/burn
+Content-Type: application/json
+
+{
+  "passphrase": "1121"
+}
+
 ### TODO: Currently here I use hardcoded values

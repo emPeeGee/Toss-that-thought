@@ -23,7 +23,8 @@ func (h *Handler) InitializeRoutes() *gin.Engine {
 		api.POST("/create", h.Create)
 		api.GET("/metadata/:id", h.Metadata)
 		api.GET("/thought/:id", h.ThoughtExists)
-		api.POST("/thought/:id", h.AccessThought)
+		api.POST("/thought/:id", h.ShowThought)
+		api.POST("/thought/:id/burn", h.BurnThought)
 	}
 
 	return router
