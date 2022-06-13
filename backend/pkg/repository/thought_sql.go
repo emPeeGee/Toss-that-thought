@@ -14,14 +14,6 @@ func NewThoughtSql(db *sqlx.DB) *ThoughtSql {
 	return &ThoughtSql{db: db}
 }
 
-func (r *ThoughtSql) Test() (interface{}, error) {
-	var thoughts []entity.Thought
-	err := r.db.Select(&thoughts, "SELECT * from thoughts th")
-	logrus.Info(thoughts)
-
-	return thoughts, err
-}
-
 func (r *ThoughtSql) Create(input entity.ThoughtInput) (entity.ThoughtCreateResponse, error) {
 	var thoughtResponse entity.ThoughtCreateResponse
 	createThoughtQuery := `INSERT INTO thoughts(thought, passphrase, lifetime) VALUES ($1, $2, $3) RETURNING metadata_key;`

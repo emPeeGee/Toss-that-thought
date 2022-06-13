@@ -20,7 +20,6 @@ func (h *Handler) InitializeRoutes() *gin.Engine {
 
 	api := router.Group("/api")
 	{
-		api.GET("/", h.test)
 		api.POST("/create", h.Create)
 		api.GET("/metadata/:id", h.Metadata)
 		api.GET("/thought/:id", h.ThoughtExists)

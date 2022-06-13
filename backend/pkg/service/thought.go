@@ -15,10 +15,6 @@ func NewThoughtService(repo repository.Thought) *ThoughtService {
 	return &ThoughtService{repo: repo}
 }
 
-func (s *ThoughtService) Test() (interface{}, error) {
-	return s.repo.Test()
-}
-
 func (s *ThoughtService) Create(input entity.ThoughtInput) (entity.ThoughtCreateResponse, error) {
 	hashedPassphrase, err := HashPassphrase(input.Passphrase)
 
