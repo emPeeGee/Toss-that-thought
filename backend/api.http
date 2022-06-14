@@ -3,10 +3,15 @@ POST http://localhost:9000/api/create
 Content-Type: application/json
 
 {
-  "thought": "Hello, Cousin, v2",
+  "thought": "Hello, Cousin, v{{$randomInt}}",
   "passphrase": "1121",
   "lifetime": "2006-01-02T15:04:05Z"
 }
+
+> {%
+  client.global.set("metadataKey", response.body.metadataKey)
+  client.global.set("thoughtKey", response.body.thoughtKey)
+ %}
 
 ### Invalid Create request
 POST http://localhost:9000/api/create
@@ -19,20 +24,20 @@ Content-Type: application/json
 }
 
 ### GET Metadata request
-GET http://localhost:9000/api/metadata/a4dfe246-02d2-493d-81f8-26edb6b11787
+GET http://localhost:9000/api/metadata/{{metadataKey}}
 
 ### Invalid GET Metadata request
 GET http://localhost:9000/api/metadata/fda
 
 ### GET CheckThoughtExists request
-GET http://localhost:9000/api/thought/52349050-3620-4ea0-921d-0e21ecac72ee
+GET http://localhost:9000/api/thought/{{thoughtKey}}
 
 ### Invalid GET CheckThoughtExists request
 GET http://localhost:9000/api/thought/fda
 
 
 ### Access thought request
-POST http://localhost:9000/api/thought/a986ae4e-400e-475f-9b04-3611c1af258a
+POST http://localhost:9000/api/thought/{{thoughtKey}}
 Content-Type: application/json
 
 {
@@ -40,7 +45,7 @@ Content-Type: application/json
 }
 
 ### Invalid Access thought request with incorrent password
-POST http://localhost:9000/api/thought/ed94cb6c-f02b-489d-9156-6ee9f0e20e41
+POST http://localhost:9000/api/thought/{{thoughtKey}}
 Content-Type: application/json
 
 {
@@ -56,11 +61,9 @@ Content-Type: application/json
 }
 
 ### Burn thought request
-POST http://localhost:9000/api/thought/14ccc936-3832-4d9f-90c1-0159ec3223ef/burn
+POST http://localhost:9000/api/thought/{{thoughtKey}}/burn
 Content-Type: application/json
 
 {
   "passphrase": "1121"
 }
-
-### TODO: Currently here I use hardcoded values

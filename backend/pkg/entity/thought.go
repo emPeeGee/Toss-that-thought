@@ -11,11 +11,11 @@ type ThoughtInput struct {
 	Lifetime   time.Time `json:"lifetime" db:"lifetime" validate:"required"`
 }
 
-type AccessThoughtInput struct {
+type ThoughtPassphraseInput struct {
 	Passphrase string `json:"passphrase" validate:"required,max=255"`
 }
 
-type AccessThoughtResponse struct {
+type ThoughtResponse struct {
 	Thought string `json:"thought" db:"thought"`
 }
 
@@ -28,10 +28,6 @@ type ThoughtMetadataResponse struct {
 	IsBurned    bool      `json:"isBurned" db:"is_burned"`
 	CreatedDate time.Time `json:"createdDate" db:"created_date"`
 	ThoughtKey  string    `json:"thoughtKey" db:"thought_key"`
-}
-
-type ThoughtResponse struct {
-	Thought string `json:"thought" db:"thought" validate:"required"`
 }
 
 // TODO: To implement Status table, with id, status, and time when status was changed

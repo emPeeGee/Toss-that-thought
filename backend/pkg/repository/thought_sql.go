@@ -27,7 +27,7 @@ func (r *ThoughtSql) Create(input entity.ThoughtInput) (entity.ThoughtCreateResp
 	return thoughtResponse, nil
 }
 
-func (r *ThoughtSql) Metadata(metadataKey string) (entity.ThoughtMetadataResponse, error) {
+func (r *ThoughtSql) RetrieveMetadata(metadataKey string) (entity.ThoughtMetadataResponse, error) {
 	var thoughtMetadata entity.ThoughtMetadataResponse
 
 	thoughtMetadataQuery := "SELECT th.lifetime, th.is_burned, th.created_date, th.thought_key FROM thoughts th WHERE th.metadata_key = $1"
@@ -49,13 +49,13 @@ func (r *ThoughtSql) CheckThoughtExists(thoughtKey string) (bool, error) {
 	return true, nil
 }
 
-func (r *ThoughtSql) ShowThought(thoughtKey, passphrase string) (entity.AccessThoughtResponse, error) {
-	var thoughtResponse entity.AccessThoughtResponse
+func (r *ThoughtSql) RetrieveThought(thoughtKey, passphrase string) (entity.ThoughtPassphraseInput, error) {
+	var thoughtResponse entity.ThoughtPassphraseInput
 	query := "SELECT th.thought from thoughts th WHERE th.thought_key = $1 AND th.passphrase = $2"
 	err := r.db.Get(&thoughtResponse, query, thoughtKey, passphrase)
 
 	if err != nil {
-		return entity.AccessThoughtResponse{}, err
+		return entity.ThoughtPassphraseInput{}, err
 	}
 
 	return thoughtResponse, nil

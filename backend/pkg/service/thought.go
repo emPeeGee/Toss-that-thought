@@ -26,25 +26,25 @@ func (s *ThoughtService) Create(input entity.ThoughtInput) (entity.ThoughtCreate
 	return s.repo.Create(input)
 }
 
-func (s *ThoughtService) Metadata(metadataKey string) (entity.ThoughtMetadataResponse, error) {
-	return s.repo.Metadata(metadataKey)
+func (s *ThoughtService) RetrieveMetadata(metadataKey string) (entity.ThoughtMetadataResponse, error) {
+	return s.repo.RetrieveMetadata(metadataKey)
 }
 
 func (s *ThoughtService) CheckThoughtExists(thoughtKey string) (bool, error) {
 	return s.repo.CheckThoughtExists(thoughtKey)
 }
 
-func (s *ThoughtService) ShowThought(thoughtKey, passphrase string) (entity.AccessThoughtResponse, error) {
+func (s *ThoughtService) RetrieveThought(thoughtKey, passphrase string) (entity.ThoughtPassphraseInput, error) {
 	hashedPassphrase, err := s.repo.GetPassphraseOfThought(thoughtKey)
 	if err != nil {
-		return entity.AccessThoughtResponse{}, err
+		return entity.ThoughtPassphraseInput{}, err
 	}
 
 	if CheckPasswordHashes(passphrase, hashedPassphrase) == false {
-		return entity.AccessThoughtResponse{}, errors.New("password does not match")
+		return entity.ThoughtPassphraseInput{}, errors.New("password does not match")
 	}
 
-	return s.repo.ShowThought(thoughtKey, hashedPassphrase)
+	return s.repo.RetrieveThought(thoughtKey, hashedPassphrase)
 }
 
 func (s *ThoughtService) BurnThought(thoughtKey, passphrase string) (bool, error) {

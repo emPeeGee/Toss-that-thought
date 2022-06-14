@@ -37,10 +37,10 @@ func (h *Handler) Create(c *gin.Context) {
 	c.JSON(http.StatusOK, thoughtMetadata)
 }
 
-func (h *Handler) Metadata(c *gin.Context) {
+func (h *Handler) RetrieveMetadata(c *gin.Context) {
 	metadataKey := c.Param("id")
 
-	thoughtMetadata, err := h.services.Thought.Metadata(metadataKey)
+	thoughtMetadata, err := h.services.Thought.RetrieveMetadata(metadataKey)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, map[string]interface{}{
 			"message": "SQL error",
@@ -71,7 +71,7 @@ func (h *Handler) ThoughtExists(c *gin.Context) {
 	})
 }
 
-func (h *Handler) ShowThought(c *gin.Context) {
+func (h *Handler) RetrieveThought(c *gin.Context) {
 	thoughtKey := c.Param("id")
 
 	exists, err := h.services.Thought.CheckThoughtExists(thoughtKey)
@@ -83,7 +83,7 @@ func (h *Handler) ShowThought(c *gin.Context) {
 		return
 	}
 
-	var accessThoughtInput entity.AccessThoughtInput
+	var accessThoughtInput entity.ThoughtPassphraseInput
 	if err := c.BindJSON(&accessThoughtInput); err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, map[string]interface{}{
 			"message": "Such thought does not exists",
@@ -92,7 +92,7 @@ func (h *Handler) ShowThought(c *gin.Context) {
 		return
 	}
 
-	accessThoughtResponse, err := h.services.Thought.ShowThought(thoughtKey, accessThoughtInput.Passphrase)
+	accessThoughtResponse, err := h.services.Thought.RetrieveThought(thoughtKey, accessThoughtInput.Passphrase)
 
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, map[string]interface{}{
@@ -118,7 +118,7 @@ func (h *Handler) BurnThought(c *gin.Context) {
 		return
 	}
 
-	var accessThoughtInput entity.AccessThoughtInput
+	var accessThoughtInput entity.ThoughtPassphraseInput
 	if err := c.BindJSON(&accessThoughtInput); err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, map[string]interface{}{
 			"message": "Incorrect body",
