@@ -1,11 +1,19 @@
 import React from 'react';
+import {BrowserRouter, Routes, Route} from 'react-router-dom'
+import {Thought} from "./features/thoughts/Thought";
+import {Login} from "./features/authentication/Login";
 
 function App() {
-  return (
-    <div className="App">
-      <h1>Title</h1>
-    </div>
-  );
+    return (
+        <>
+            <BrowserRouter>
+                <Routes>
+               <Route path="/" element={<Thought />}/>
+                    <Route path="/login" element={<Login />}/>
+                </Routes>
+            </BrowserRouter>
+        </>
+    );
 }
 
 export default App;
