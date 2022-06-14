@@ -1,6 +1,6 @@
 import React from 'react';
-import logo from '../../../assets/logo.svg';
-import { Anchor } from '../../navigation/Anchor/Anchor';
+import { Anchor } from 'components/navigation/Anchor/Anchor';
+import logo from 'assets/logo.svg';
 
 import {
   Icon,
