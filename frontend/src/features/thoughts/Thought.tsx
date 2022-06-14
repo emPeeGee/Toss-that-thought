@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button } from '@mantine/core';
 
-export function Thought(): JSX.Element {
+export function Thought() {
   return (
     <div>
       <h1>Thought</h1>
