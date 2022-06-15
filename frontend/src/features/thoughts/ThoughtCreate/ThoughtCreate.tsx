@@ -9,9 +9,10 @@ import {
   Alert,
   Highlight
 } from '@mantine/core';
-import { AlertCircle } from 'tabler-icons-react';
+import { AlertCircle, MessageCircle2 } from 'tabler-icons-react';
+import { Link } from 'react-router-dom';
 
-export function Thought() {
+export function ThoughtCreate() {
   return (
     <Container size="md">
       <Text my="lg" align="center" color="dark" weight={700} style={{ fontSize: 30 }}>
@@ -56,7 +57,14 @@ export function Thought() {
         transitionTimingFunction="ease"
       />
 
-      <Button variant="light" my="lg" fullWidth style={{ marginBottom: '64px' }}>
+      <Button<typeof Link>
+        fullWidth
+        to="/metadata/1234"
+        variant="light"
+        my="lg"
+        leftIcon={<MessageCircle2 size={24} />}
+        component={Link}
+        style={{ marginBottom: '64px' }}>
         Create that thought
       </Button>
 
