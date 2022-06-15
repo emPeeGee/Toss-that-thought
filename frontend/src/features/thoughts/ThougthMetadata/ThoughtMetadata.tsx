@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Code, Container, Divider, Grid, Paper, Text } from '@mantine/core';
+import { Alert, Button, Code, Container, Divider, Grid, Paper, Text } from '@mantine/core';
 import { Link, useParams } from 'react-router-dom';
 import { Bolt, MessageCircle2 } from 'tabler-icons-react';
 
@@ -36,7 +36,7 @@ export function ThoughtMetadata() {
         </Text>
       </Grid>
       <Button<typeof Link>
-        to="/metadata/1234"
+        to={`/thought/${metadataKey}/burn`}
         leftIcon={<Bolt size={24} />}
         variant="light"
         my="lg"
@@ -45,9 +45,14 @@ export function ThoughtMetadata() {
         Burn this thought
       </Button>
       <Divider my="md" />
-      <Text color="dimmed" my="lg" style={{ fontStyle: 'italic' }}>
-        * Burning a secret will delete it before it has been read (click to confirm).
-      </Text>
+      <Alert
+        color="red"
+        withCloseButton
+        title="Advice"
+        onClose={() => {}}
+        closeButtonLabel="Close advice">
+        Burning a thought will delete it before it has been read (click to confirm).
+      </Alert>
       <Divider my="md" />
       <Button<typeof Link>
         to="/"

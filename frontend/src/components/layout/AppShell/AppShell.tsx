@@ -12,7 +12,12 @@ const useStyles = createStyles(() => ({
     padding: 0,
     margin: 0,
     display: 'flex',
-    flexDirection: 'column'
+    flexDirection: 'column',
+
+    '& > *': {
+      width: '100%',
+      flexGrow: 1
+    }
   }
 }));
 

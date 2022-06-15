@@ -14,7 +14,7 @@ import { Link } from 'react-router-dom';
 
 export function ThoughtCreate() {
   return (
-    <Container size="md">
+    <Container>
       <Text my="lg" align="center" color="dark" weight={700} style={{ fontSize: 30 }}>
         Paste a password, secret message or private link below.
       </Text>

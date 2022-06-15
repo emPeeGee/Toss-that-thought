@@ -3,10 +3,10 @@ import { Anchor } from 'components/navigation/Anchor/Anchor';
 import logo from 'assets/logo.svg';
 
 import {
+  IconGroup,
   Icon,
   IconTitle,
   Items,
-  ItemsLeft,
   ItemsRight,
   ListItem,
   UnorderedList,
@@ -17,10 +17,10 @@ export function Header() {
   return (
     <Wrapper>
       <Items>
-        <ItemsLeft>
+        <IconGroup to="/">
           <Icon src={logo} />
           <IconTitle>Toss That Thought</IconTitle>
-        </ItemsLeft>
+        </IconGroup>
         <ItemsRight>
           <UnorderedList>
             <ListItem>
