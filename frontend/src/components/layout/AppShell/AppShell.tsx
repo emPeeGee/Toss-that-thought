@@ -15,8 +15,7 @@ const useStyles = createStyles(() => ({
     flexDirection: 'column',
 
     '& > *': {
-      width: '100%',
-      flexGrow: 1
+      width: '100%'
     }
   }
 }));
