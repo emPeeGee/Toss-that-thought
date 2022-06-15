@@ -8,7 +8,6 @@ export function ThoughtMetadata() {
 
   return (
     <Container my="xl">
-      <Text>Hey {metadataKey}</Text>
       <Paper shadow="xs" p="md" my="md" withBorder>
         <Text size="xl" weight="500">
           Share the link:
