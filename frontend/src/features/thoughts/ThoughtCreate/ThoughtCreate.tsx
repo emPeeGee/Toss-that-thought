@@ -7,7 +7,8 @@ import {
   Button,
   Text,
   Alert,
-  Highlight
+  Highlight,
+  Title
 } from '@mantine/core';
 import { AlertCircle, MessageCircle2 } from 'tabler-icons-react';
 import { Link } from 'react-router-dom';
@@ -15,11 +16,11 @@ import { Link } from 'react-router-dom';
 export function ThoughtCreate() {
   return (
     <Container>
-      <Text my="lg" align="center" color="dark" weight={700} style={{ fontSize: 30 }}>
-        Paste a password, secret message or private link below.
-      </Text>
+      <Title order={1} my="lg" align="center" color="dark" style={{ fontSize: 30 }}>
+        Paste a password, secret message or private link below. 💭
+      </Title>
       <Text my="lg" align="center" size="md" color="gray" weight={500}>
-        Keep sensitive info out of your email and chat logs.
+        Keep sensitive info out of your email and chat logs. 👀
       </Text>
 
       <Textarea

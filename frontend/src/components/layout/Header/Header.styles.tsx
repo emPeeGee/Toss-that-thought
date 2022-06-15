@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 
 export const Wrapper = styled.header`
   padding: 16px 8px;
+  margin-bottom: 32px;
   border-bottom: 1px solid #e0e3e8;
 `;
 
@@ -32,8 +33,6 @@ export const Items = styled.div`
   align-items: center;
   justify-content: space-between;
 `;
-
-export const ItemsLeft = styled.div``;
 
 export const ItemsRight = styled.div``;
 

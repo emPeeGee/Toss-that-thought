@@ -4,9 +4,13 @@ import logo from 'assets/logo.svg';
 
 const useStyles = createStyles((theme, _params, getRef) => ({
   footer: {
+    marginTop: 'auto'
+  },
+
+  container: {
     display: 'flex',
     flexDirection: 'column',
-    marginTop: 'auto',
+    marginTop: '64px',
     backgroundColor: theme.colors.gray[1],
     padding: '16px 32px'
   },
@@ -67,34 +71,36 @@ export function Footer() {
 
   return (
     <footer className={classes.footer}>
-      <div className={classes.info}>
-        <div className={classes.logo}>
-          <img src={logo} alt="" />
-          <h3>Toss that thought.</h3>
+      <div className={classes.container}>
+        <div className={classes.info}>
+          <div className={classes.logo}>
+            <img src={logo} alt="" />
+            <h3>Toss that thought.</h3>
+          </div>
+          <div>
+            <Text color="dimmed">
+              Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ad, alias aliquid animi{' '}
+            </Text>
+          </div>
         </div>
-        <div>
-          <Text color="dimmed">
-            Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ad, alias aliquid animi{' '}
-          </Text>
-        </div>
+
+        <nav className={classes.links}>
+          <h4>Links</h4>
+          <ul>
+            <li>
+              <Anchor href="/">About</Anchor>
+            </li>
+            <li>
+              <Anchor href="/">Code</Anchor>
+            </li>
+            <li>
+              <Anchor href="/">Other</Anchor>
+            </li>
+          </ul>
+        </nav>
+
+        <Text color="gray">Build with 💙 by emPeeGee.</Text>
       </div>
-
-      <nav className={classes.links}>
-        <h4>Links</h4>
-        <ul>
-          <li>
-            <Anchor href="/">About</Anchor>
-          </li>
-          <li>
-            <Anchor href="/">Code</Anchor>
-          </li>
-          <li>
-            <Anchor href="/">Other</Anchor>
-          </li>
-        </ul>
-      </nav>
-
-      <Text color="gray">Build with 💙 by emPeeGee.</Text>
     </footer>
   );
 }

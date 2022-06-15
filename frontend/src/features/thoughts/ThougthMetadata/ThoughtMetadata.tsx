@@ -1,5 +1,5 @@
 import React from 'react';
-import { Alert, Button, Code, Container, Divider, Grid, Paper, Text } from '@mantine/core';
+import { Alert, Button, Code, Container, Divider, Grid, Paper, Text, Title } from '@mantine/core';
 import { Link, useParams } from 'react-router-dom';
 import { Bolt, MessageCircle2 } from 'tabler-icons-react';
 
@@ -8,6 +8,9 @@ export function ThoughtMetadata() {
 
   return (
     <Container my="xl">
+      <Title order={1} my="lg">
+        Thought metadata 💭
+      </Title>
       <Paper shadow="xs" p="md" my="md" withBorder>
         <Text size="xl" weight="500">
           Share the link:
