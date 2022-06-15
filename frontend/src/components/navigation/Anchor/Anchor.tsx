@@ -1,6 +1,11 @@
 import React from 'react';
-import { StyledAnchor } from './Anchor.styles';
+import { Anchor as MantineAnchor } from '@mantine/core';
+import { Link } from 'react-router-dom';
 
 export function Anchor({ to, title }: { to: string; title: string }) {
-  return <StyledAnchor to={to}>{title}</StyledAnchor>;
+  return (
+    <MantineAnchor component={Link} to={to}>
+      {title}
+    </MantineAnchor>
+  );
 }
