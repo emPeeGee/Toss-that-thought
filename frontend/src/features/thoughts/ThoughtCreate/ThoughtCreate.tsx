@@ -15,6 +15,7 @@ import {
 import { AlertCircle, MessageCircle2 } from 'tabler-icons-react';
 import { Link } from 'react-router-dom';
 import { SubmitHandler, useForm, Controller } from 'react-hook-form';
+import { getCurrentDatePlus } from '../../../utils/date';
 
 interface Create {
   thought: string;
@@ -22,24 +23,22 @@ interface Create {
   lifetime: any;
 }
 
+// Bad place and name
 interface SelectEntry {
   value: string;
   label: string;
 }
 
-// TODO: To rename
-function getDate(hours: number): string {
-  const now = new Date();
-  now.setHours(now.getHours() + hours);
-
-  return now.toISOString();
-}
-
-// TODO: To use an enum for hours
+// Is it good place to store?
 const lifetimeOptions: SelectEntry[] = [
-  { value: getDate(168), label: '7 days' },
-  { value: getDate(72), label: '3 days' },
-  { value: getDate(24), label: '1 days' }
+  { value: getCurrentDatePlus(168).toISOString(), label: '7 days' },
+  { value: getCurrentDatePlus(72).toISOString(), label: '3 days' },
+  { value: getCurrentDatePlus(24).toISOString(), label: '1 days' },
+  { value: getCurrentDatePlus(12).toISOString(), label: '12 hours' },
+  { value: getCurrentDatePlus(4).toISOString(), label: '4 hours' },
+  { value: getCurrentDatePlus(1).toISOString(), label: '1 hour' },
+  { value: getCurrentDatePlus(0, 30).toISOString(), label: '30 minutes' },
+  { value: getCurrentDatePlus(0, 5).toISOString(), label: '5 minutes' }
 ];
 
 export function ThoughtCreate() {
