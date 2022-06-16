@@ -12,7 +12,6 @@ export const IconGroup = styled(Link)`
   justify-content: center;
   align-items: center;
   text-decoration: none;
-  color: black;
 
   &:focus {
     outline: 2px solid orange;
@@ -22,10 +21,6 @@ export const IconGroup = styled(Link)`
 export const Icon = styled.img`
   width: 36px;
   height: 36px;
-`;
-
-export const IconTitle = styled.b`
-  font-size: 17px;
 `;
 
 export const Items = styled.div`

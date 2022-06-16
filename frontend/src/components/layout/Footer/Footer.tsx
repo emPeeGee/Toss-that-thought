@@ -11,7 +11,7 @@ const useStyles = createStyles((theme, _params, getRef) => ({
     display: 'flex',
     flexDirection: 'column',
     marginTop: '64px',
-    backgroundColor: theme.colors.gray[1],
+    backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[1],
     padding: '16px 32px'
   },
 

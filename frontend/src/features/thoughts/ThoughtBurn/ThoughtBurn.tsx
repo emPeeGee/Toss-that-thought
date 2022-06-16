@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Alert, Button, Container, Divider, Text, TextInput, Title } from '@mantine/core';
 import { ArrowBackUp, Bolt } from 'tabler-icons-react';
+import { Link, useParams } from 'react-router-dom';
 // import { useParams } from 'react-router-dom';
 
 export function ThoughtBurn() {
-  // const { metadataKey } = useParams();
+  const { metadataKey } = useParams();
+  const [isAdviceAlertVisible, setIsAdviceAlertVisible] = useState(true);
 
   return (
     <Container size="md" my="xl">
@@ -14,23 +16,41 @@ export function ThoughtBurn() {
       <Text>Thought {`1543gf ${4}`}</Text>
       <TextInput my="md" placeholder="Enter passphrase here" />
 
-      <Button fullWidth my="lg" leftIcon={<Bolt size={24} />}>
+      <Button<typeof Link>
+        component={Link}
+        to={`/metadata/${metadataKey}`}
+        fullWidth
+        my="lg"
+        color="orange"
+        leftIcon={<Bolt size={24} />}>
         Burn this thought
       </Button>
-      <Button fullWidth my="lg" leftIcon={<ArrowBackUp size={24} />}>
+      <Button<typeof Link>
+        component={Link}
+        to={`/metadata/${metadataKey}`}
+        fullWidth
+        variant="outline"
+        color="gray"
+        my="lg"
+        leftIcon={<ArrowBackUp size={24} />}>
         Cancel
       </Button>
 
-      <Divider my="md" />
-
-      <Alert
-        withCloseButton
-        color="red"
-        title="Advice"
-        closeButtonLabel="Close advice"
-        onClose={() => {}}>
-        Burning a secret is permanent and cannot be undone
-      </Alert>
+      {isAdviceAlertVisible && (
+        <>
+          <Divider my="md" />
+          <Alert
+            withCloseButton
+            color="red"
+            title="Advice"
+            closeButtonLabel="Close advice"
+            onClose={() => {
+              setIsAdviceAlertVisible(false);
+            }}>
+            Burning a secret is permanent and cannot be undone
+          </Alert>
+        </>
+      )}
     </Container>
   );
 }

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Container,
   Textarea,
@@ -7,13 +7,14 @@ import {
   Button,
   Text,
   Alert,
-  Highlight,
-  Title
+  Title,
+  Anchor
 } from '@mantine/core';
 import { AlertCircle, MessageCircle2 } from 'tabler-icons-react';
 import { Link } from 'react-router-dom';
 
 export function ThoughtCreate() {
+  const [isCreateAccountAlertVissible, setIsCreateAccountAlertVissible] = useState(true);
   return (
     <Container>
       <Title order={1} my="lg" align="center" color="dark" style={{ fontSize: 30 }}>
@@ -59,39 +60,40 @@ export function ThoughtCreate() {
       />
 
       <Button<typeof Link>
+        component={Link}
         fullWidth
         to="/metadata/1234"
         variant="light"
         my="lg"
         leftIcon={<MessageCircle2 size={24} />}
-        component={Link}
         style={{ marginBottom: '64px' }}>
         Create that thought
       </Button>
 
-      <Text color="gray" align="center">
+      <Text color="gray" align="center" style={{ fontStyle: 'italic' }}>
         * A thought link only works once and then disappears forever.
       </Text>
       <Text color="gray" align="center">
-        Sign up for a free account to set passphrases for extra security along with additional
-        privacy options. We will even email the link for you if you want.
+        Sign up for a{' '}
+        <Anchor component={Link} to="/sign-up" aria-label="Create free account">
+          free account
+        </Anchor>{' '}
+        to set passphrases for extra security along with additional privacy options. We will even
+        email the link for you if you want.
       </Text>
 
-      <Alert
-        my="md"
-        icon={<AlertCircle size={16} />}
-        withCloseButton
-        closeButtonLabel="Close create a account alert">
-        <Highlight
-          highlight="Stay anonymous!"
-          highlightStyles={(theme) => ({
-            background: 'transparent',
-            color: theme.colors.blue[9],
-            fontWeight: 500
-          })}>
-          Stay anonymous! Create a account
-        </Highlight>
-      </Alert>
+      {isCreateAccountAlertVissible && (
+        <Alert
+          my="md"
+          color="yellow"
+          icon={<AlertCircle size={28} />}
+          title="Stay anonymous"
+          withCloseButton
+          closeButtonLabel="Close alert 'Create a account using a temporary email address'"
+          onClose={() => setIsCreateAccountAlertVissible(false)}>
+          Create an account using a temporary email address.
+        </Alert>
+      )}
     </Container>
   );
 }

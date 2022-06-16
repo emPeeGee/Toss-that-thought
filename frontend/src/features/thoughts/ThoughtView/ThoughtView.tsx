@@ -6,19 +6,14 @@ import { Link } from 'react-router-dom';
 
 export function ThoughtView() {
   // const { thoughtKey} = useParams();
-  const [isAlertVisible, setIsAlertVisible] = useState(true);
+  const [isCarefulAlertVisible, setIsCarefulAlertVisible] = useState(true);
   const [isThoughtValid] = useState(true);
-  const [isPassphraseCorrect, setIsPassphraseCorrect] = useState(false);
+  const [isPassphraseCorrect, setIsPassphraseCorrect] = useState(true);
 
   if (!isThoughtValid) {
     return (
       <Container size="md" my="xl">
-        <Alert
-          withCloseButton
-          color="red"
-          title="Hmmm"
-          closeButtonLabel="Close advice"
-          onClose={() => {}}>
+        <Alert color="red" title="Hmmm">
           It either never existed or has already been viewed.
         </Alert>
       </Container>
@@ -45,21 +40,6 @@ export function ThoughtView() {
             leftIcon={<ArrowForwardUp size={24} />}>
             Reply with another thought
           </Button>
-
-          <Divider my="md" />
-
-          {isAlertVisible && (
-            <Alert
-              withCloseButton
-              color="orange"
-              title="Careful"
-              closeButtonLabel="Close advice"
-              onClose={() => {
-                setIsAlertVisible(false);
-              }}>
-              We will only show it once
-            </Alert>
-          )}
         </>
       ) : (
         <>
@@ -72,16 +52,19 @@ export function ThoughtView() {
             onClick={() => setIsPassphraseCorrect(true)}>
             View thought
           </Button>
+        </>
+      )}
 
+      {isCarefulAlertVisible && (
+        <>
           <Divider my="md" />
-
           <Alert
             withCloseButton
             color="orange"
             title="Careful"
             closeButtonLabel="Close advice"
             onClose={() => {
-              setIsAlertVisible(false);
+              setIsCarefulAlertVisible(false);
             }}>
             We will only show it once
           </Alert>

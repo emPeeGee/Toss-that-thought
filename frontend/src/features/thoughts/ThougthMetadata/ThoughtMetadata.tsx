@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Alert, Button, Code, Container, Divider, Grid, Paper, Text, Title } from '@mantine/core';
 import { Link, useParams } from 'react-router-dom';
 import { Bolt, MessageCircle2 } from 'tabler-icons-react';
 
 export function ThoughtMetadata() {
   const { metadataKey } = useParams();
+  const [isAdviceAlertVissible, setIsAdviceAlertVissible] = useState(true);
 
   return (
     <Container my="xl">
@@ -42,21 +43,28 @@ export function ThoughtMetadata() {
         to={`/thought/${metadataKey}/burn`}
         leftIcon={<Bolt size={24} />}
         variant="light"
+        color="orange"
         my="lg"
         fullWidth
         component={Link}>
         Burn this thought
       </Button>
-      <Divider my="md" />
-      <Alert
-        color="red"
-        withCloseButton
-        title="Advice"
-        onClose={() => {}}
-        closeButtonLabel="Close advice">
-        Burning a thought will delete it before it has been read (click to confirm).
-      </Alert>
-      <Divider my="md" />
+      {isAdviceAlertVissible && (
+        <>
+          <Divider my="md" />
+          <Alert
+            color="red"
+            withCloseButton
+            title="Advice"
+            onClose={() => {
+              setIsAdviceAlertVissible(false);
+            }}
+            closeButtonLabel="Close advice">
+            Burning a thought will delete it before it has been read (click to confirm).
+          </Alert>
+          <Divider my="md" />
+        </>
+      )}
       <Button<typeof Link>
         to="/"
         leftIcon={<MessageCircle2 size={24} />}
