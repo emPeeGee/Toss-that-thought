@@ -7,10 +7,13 @@ import { GlobalStyles } from 'assets/styles/globalStyles';
 import { Footer } from 'components/layout/Footer/Footer';
 import { AppShell } from 'components/layout/AppShell/AppShell';
 import { ThoughtMetadata, ThoughtCreate, ThoughtBurn, ThoughtView } from 'features/thoughts';
+import { NotFound } from 'components/layout/NotFound/NotFound';
 
 function App() {
   return (
     <MantineProvider
+      withGlobalStyles
+      withNormalizeCSS
       defaultProps={{
         Container: {
           sizes: {
@@ -35,6 +38,7 @@ function App() {
             <Route path="/metadata/:metadataKey" element={<ThoughtMetadata />} />
             <Route path="/thought/:thoughtKey" element={<ThoughtView />} />
             <Route path="/thought/:metadataKey/burn" element={<ThoughtBurn />} />
+            <Route path="*" element={<NotFound />} />
           </Routes>
           <Footer />
         </AppShell>
