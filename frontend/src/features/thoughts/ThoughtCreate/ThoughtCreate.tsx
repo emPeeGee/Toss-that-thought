@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-props-no-spreading */
 import React, { useState } from 'react';
 import {
   Container,
@@ -8,15 +9,79 @@ import {
   Text,
   Alert,
   Title,
-  Anchor
+  Anchor,
+  LoadingOverlay
 } from '@mantine/core';
 import { AlertCircle, MessageCircle2 } from 'tabler-icons-react';
 import { Link } from 'react-router-dom';
+import { SubmitHandler, useForm, Controller } from 'react-hook-form';
+
+interface Create {
+  thought: string;
+  passphrase: string;
+  lifetime: any;
+}
+
+interface SelectEntry {
+  value: string;
+  label: string;
+}
+
+// TODO: To rename
+function getDate(hours: number): string {
+  const now = new Date();
+  now.setHours(now.getHours() + hours);
+
+  return now.toISOString();
+}
+
+// TODO: To use an enum for hours
+const lifetimeOptions: SelectEntry[] = [
+  { value: getDate(168), label: '7 days' },
+  { value: getDate(72), label: '3 days' },
+  { value: getDate(24), label: '1 days' }
+];
 
 export function ThoughtCreate() {
-  const [isCreateAccountAlertVissible, setIsCreateAccountAlertVissible] = useState(true);
+  const {
+    register,
+    handleSubmit,
+    control,
+    formState: { errors }
+  } = useForm<Create>({
+    defaultValues: {
+      lifetime: lifetimeOptions[1].value
+    }
+  });
+  const [isCreateAccountAlertVisible, setIsCreateAccountAlertVisible] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const thoughtSubmit: SubmitHandler<Create> = async (data) => {
+    console.log(data);
+
+    setIsLoading(true);
+    fetch('http://localhost:9000/api/create', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    })
+      .then((value) => value.json())
+      .then((val) => {
+        console.log(val);
+      })
+      .catch((reason) => {
+        console.log(reason);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  };
+
   return (
     <Container>
+      <LoadingOverlay visible={isLoading} />
       <Title order={1} my="lg" align="center" color="dark" style={{ fontSize: 30 }}>
         Paste a password, secret message or private link below. 💭
       </Title>
@@ -25,11 +90,13 @@ export function ThoughtCreate() {
       </Text>
 
       <Textarea
+        {...register('thought', { required: true, maxLength: 1000 })}
         aria-label="Paste a password, secret message or private link below"
         my="lg"
         placeholder="Your thought goes here"
         autosize
         minRows={10}
+        error={errors.thought ? 'Field is invalid' : null}
       />
 
       <TextInput
@@ -40,23 +107,30 @@ export function ThoughtCreate() {
         description="A word or a passphrase that is difficult to guess"
         radius="md"
         size="md"
+        {...register('passphrase', { required: true, maxLength: 255 })}
+        error={errors.passphrase ? 'Field is invalid' : null}
       />
 
-      <Select
-        required
-        label="Lifetime"
-        description="After passing lifetime thought will be no more available"
-        size="md"
-        my="md"
-        variant="filled"
-        data={[
-          { value: '7', label: '7 days' },
-          { value: '3', label: '3 days' },
-          { value: '1', label: '1 days' }
-        ]}
-        transition="pop-top-left"
-        transitionDuration={80}
-        transitionTimingFunction="ease"
+      <Controller
+        name="lifetime"
+        control={control}
+        rules={{ required: true }}
+        render={({ field }) => (
+          <Select
+            {...field}
+            required
+            label="Lifetime"
+            description="After passing lifetime thought will be no more available"
+            size="md"
+            my="md"
+            variant="filled"
+            data={lifetimeOptions}
+            transition="pop-top-left"
+            transitionDuration={80}
+            transitionTimingFunction="ease"
+            error={errors.lifetime ? 'Field is invalid' : null}
+          />
+        )}
       />
 
       <Button<typeof Link>
@@ -66,7 +140,8 @@ export function ThoughtCreate() {
         variant="light"
         my="lg"
         leftIcon={<MessageCircle2 size={24} />}
-        style={{ marginBottom: '64px' }}>
+        style={{ marginBottom: '64px' }}
+        onClick={handleSubmit(thoughtSubmit)}>
         Create that thought
       </Button>
 
@@ -82,7 +157,7 @@ export function ThoughtCreate() {
         email the link for you if you want.
       </Text>
 
-      {isCreateAccountAlertVissible && (
+      {isCreateAccountAlertVisible && (
         <Alert
           my="md"
           color="yellow"
@@ -90,7 +165,7 @@ export function ThoughtCreate() {
           title="Stay anonymous"
           withCloseButton
           closeButtonLabel="Close alert 'Create a account using a temporary email address'"
-          onClose={() => setIsCreateAccountAlertVissible(false)}>
+          onClose={() => setIsCreateAccountAlertVisible(false)}>
           Create an account using a temporary email address.
         </Alert>
       )}
