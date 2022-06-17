@@ -5,11 +5,11 @@ module.exports = {
     jest: true
   },
   extends: [
-    'plugin:react/recommended',
     'airbnb',
     'airbnb-typescript',
     'eslint:recommended',
     'plugin:react/recommended',
+    'plugin:react-hooks/recommended',
     'plugin:prettier/recommended'
   ],
   parser: '@typescript-eslint/parser',

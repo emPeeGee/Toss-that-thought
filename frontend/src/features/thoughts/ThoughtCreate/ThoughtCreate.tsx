@@ -13,15 +13,11 @@ import {
   LoadingOverlay
 } from '@mantine/core';
 import { AlertCircle, MessageCircle2 } from 'tabler-icons-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { SubmitHandler, useForm, Controller } from 'react-hook-form';
-import { getCurrentDatePlus } from '../../../utils/date';
-
-interface Create {
-  thought: string;
-  passphrase: string;
-  lifetime: any;
-}
+import { api } from 'services/http';
+import { getCurrentDatePlus } from 'utils/date';
+import { ThoughtCreateRequest, ThoughtMetadataModel } from 'features/thoughts/thought.model';
 
 // Bad place and name
 interface SelectEntry {
@@ -42,35 +38,34 @@ const lifetimeOptions: SelectEntry[] = [
 ];
 
 export function ThoughtCreate() {
+  const navigate = useNavigate();
+
   const {
     register,
     handleSubmit,
     control,
     formState: { errors }
-  } = useForm<Create>({
+  } = useForm<ThoughtCreateRequest>({
     defaultValues: {
       lifetime: lifetimeOptions[1].value
     }
   });
   const [isCreateAccountAlertVisible, setIsCreateAccountAlertVisible] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
+  const [isError, setIsError] = useState(false);
 
-  const thoughtSubmit: SubmitHandler<Create> = async (data) => {
-    console.log(data);
-
+  const thoughtSubmit: SubmitHandler<ThoughtCreateRequest> = async (data) => {
     setIsLoading(true);
-    fetch('http://localhost:9000/api/create', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(data)
-    })
-      .then((value) => value.json())
-      .then((val) => {
-        console.log(val);
+    api
+      .post<ThoughtCreateRequest, ThoughtMetadataModel>({ url: 'create', body: data })
+      .then((response) => {
+        navigate('metadata/423432', {
+          replace: true,
+          state: response
+        });
       })
       .catch((reason) => {
+        setIsError(true);
         console.log(reason);
       })
       .finally(() => {
@@ -99,14 +94,13 @@ export function ThoughtCreate() {
       />
 
       <TextInput
-        required
         variant="filled"
         my="md"
         label="Passphrase"
         description="A word or a passphrase that is difficult to guess"
         radius="md"
         size="md"
-        {...register('passphrase', { required: true, maxLength: 255 })}
+        {...register('passphrase')}
         error={errors.passphrase ? 'Field is invalid' : null}
       />
 
@@ -132,17 +126,18 @@ export function ThoughtCreate() {
         )}
       />
 
-      <Button<typeof Link>
-        component={Link}
-        fullWidth
-        to="/metadata/1234"
-        variant="light"
-        my="lg"
-        leftIcon={<MessageCircle2 size={24} />}
-        style={{ marginBottom: '64px' }}
-        onClick={handleSubmit(thoughtSubmit)}>
-        Create that thought
-      </Button>
+      <Container my="lg" px={0} style={{ marginBottom: '64px' }}>
+        <Button<typeof Link>
+          component={Link}
+          fullWidth
+          to="/metadata/1234"
+          variant="light"
+          leftIcon={<MessageCircle2 size={24} />}
+          onClick={handleSubmit(thoughtSubmit)}>
+          Create that thought
+        </Button>
+        {isError && <Text color="red">An unknown error occurred</Text>}
+      </Container>
 
       <Text color="gray" align="center" style={{ fontStyle: 'italic' }}>
         * A thought link only works once and then disappears forever.

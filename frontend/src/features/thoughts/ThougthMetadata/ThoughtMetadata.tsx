@@ -1,11 +1,29 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Alert, Button, Code, Container, Divider, Grid, Paper, Text, Title } from '@mantine/core';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useLocation, useParams } from 'react-router-dom';
 import { Bolt, MessageCircle2 } from 'tabler-icons-react';
+import { isObjectEmpty } from 'utils/is-empty';
+import { ThoughtMetadataModel } from 'features/thoughts/thought.model';
 
+// TODO: Check if such metadata exists
 export function ThoughtMetadata() {
+  const { state: routerState } = useLocation();
   const { metadataKey } = useParams();
-  const [isAdviceAlertVissible, setIsAdviceAlertVissible] = useState(true);
+  const [isAdviceAlertVisible, setIsAdviceAlertVisible] = useState(true);
+  const [thoughtMetadata, SetThoughtMetadata] = useState<ThoughtMetadataModel>();
+
+  useEffect(() => {
+    console.log(routerState);
+    if (isObjectEmpty(routerState)) {
+      console.log('state is empty');
+    } else {
+      SetThoughtMetadata({ ...(routerState as ThoughtMetadataModel) });
+      window.history.replaceState({}, document.title);
+
+      console.log('not empty');
+      console.log(thoughtMetadata);
+    }
+  }, [routerState]);
 
   return (
     <Container my="xl">
@@ -49,7 +67,7 @@ export function ThoughtMetadata() {
         component={Link}>
         Burn this thought
       </Button>
-      {isAdviceAlertVissible && (
+      {isAdviceAlertVisible && (
         <>
           <Divider my="md" />
           <Alert
@@ -57,7 +75,7 @@ export function ThoughtMetadata() {
             withCloseButton
             title="Advice"
             onClose={() => {
-              setIsAdviceAlertVissible(false);
+              setIsAdviceAlertVisible(false);
             }}
             closeButtonLabel="Close advice">
             Burning a thought will delete it before it has been read (click to confirm).
