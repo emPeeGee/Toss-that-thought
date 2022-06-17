@@ -28,7 +28,25 @@ function App() {
               lg: 1140,
               xl: 1320
             }
-          }
+          },
+          Button: { tabIndex: 0 },
+          Anchor: { tabIndex: 0 }
+        }}
+        styles={{
+          Button: (theme) => ({
+            root: {
+              '&:focus': {
+                outline: `2px solid ${theme.colors.orange[5]} !important`
+              }
+            }
+          }),
+          ActionIcon: (theme) => ({
+            root: {
+              '&:focus': {
+                outline: `2px solid ${theme.colors.orange[5]} !important`
+              }
+            }
+          })
         }}
         theme={{
           colorScheme,

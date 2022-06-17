@@ -25,7 +25,7 @@ export function Header() {
   return (
     <Wrapper>
       <Items>
-        <IconGroup to="/">
+        <IconGroup to="/" tabIndex={0}>
           <Icon src={logo} alt="Application logo" />
           <Text weight={700} color={isDark ? 'white' : 'black'}>
             Toss That Thought
