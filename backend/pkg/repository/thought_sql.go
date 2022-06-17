@@ -14,10 +14,10 @@ func NewThoughtSql(db *sqlx.DB) *ThoughtSql {
 	return &ThoughtSql{db: db}
 }
 
-func (r *ThoughtSql) Create(input entity.ThoughtInput) (entity.ThoughtCreateResponse, error) {
+// TODO: If there is no passphrase when what to send to front?
+func (r *ThoughtSql) Create(input entity.ThoughtCreateInput) (entity.ThoughtCreateResponse, error) {
 	var thoughtResponse entity.ThoughtCreateResponse
-	// Todo: As I wrote in Notion
-	createThoughtQuery := `INSERT INTO thoughts(thought, passphrase, lifetime) VALUES ($1, $2, $3) RETURNING metadata_key;`
+	createThoughtQuery := `INSERT INTO thoughts(thought, passphrase, lifetime) VALUES ($1, $2, $3) RETURNING metadata_key, thought_key, is_burned, lifetime`
 	row := r.db.QueryRowx(createThoughtQuery, input.Thought, input.Passphrase, input.Lifetime)
 
 	if err := row.StructScan(&thoughtResponse); err != nil {

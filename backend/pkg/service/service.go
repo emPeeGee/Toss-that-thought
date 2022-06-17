@@ -21,7 +21,7 @@ type Authorization interface {
 }
 
 type Thought interface {
-	Create(entity.ThoughtInput) (entity.ThoughtCreateResponse, error)
+	Create(input entity.ThoughtCreateInput) (entity.ThoughtCreateResponse, error)
 	RetrieveMetadata(metadataKey string) (entity.ThoughtMetadataResponse, error)
 	RetrieveThought(thoughtKey, passphrase string) (entity.ThoughtPassphraseInput, error)
 	CheckThoughtExists(thoughtKey string) (bool, error)

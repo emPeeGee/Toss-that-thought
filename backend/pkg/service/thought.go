@@ -15,14 +15,15 @@ func NewThoughtService(repo repository.Thought) *ThoughtService {
 	return &ThoughtService{repo: repo}
 }
 
-func (s *ThoughtService) Create(input entity.ThoughtInput) (entity.ThoughtCreateResponse, error) {
-	hashedPassphrase, err := HashPassphrase(input.Passphrase)
-
-	if err != nil {
-		return entity.ThoughtCreateResponse{}, err
+func (s *ThoughtService) Create(input entity.ThoughtCreateInput) (entity.ThoughtCreateResponse, error) {
+	if len(input.Passphrase) != 0 {
+		hashedPassphrase, err := HashPassphrase(input.Passphrase)
+		if err != nil {
+			return entity.ThoughtCreateResponse{}, err
+		}
+		input.Passphrase = hashedPassphrase
 	}
 
-	input.Passphrase = hashedPassphrase
 	return s.repo.Create(input)
 }
 

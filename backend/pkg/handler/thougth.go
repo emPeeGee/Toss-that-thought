@@ -7,7 +7,7 @@ import (
 )
 
 func (h *Handler) Create(c *gin.Context) {
-	var input entity.ThoughtInput
+	var input entity.ThoughtCreateInput
 
 	if err := c.BindJSON(&input); err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, map[string]interface{}{
