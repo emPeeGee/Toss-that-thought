@@ -3,6 +3,7 @@ export interface ThoughtMetadataModel {
   metadataKey: string;
   lifetime: string;
   passphrase?: string;
+  abbreviatedThoughtKey?: string;
 }
 
 export interface ThoughtCreateRequest {

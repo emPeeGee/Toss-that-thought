@@ -59,7 +59,7 @@ export function ThoughtCreate() {
     api
       .post<ThoughtCreateRequest, ThoughtMetadataModel>({ url: 'create', body: data })
       .then((response) => {
-        navigate('metadata/423432', {
+        navigate(`metadata/${response.metadataKey}`, {
           replace: true,
           state: response
         });

@@ -1,5 +1,7 @@
 export const isObjectEmpty = (target: any) => {
-  return (
-    target && Object.keys(target).length === 0 && Object.getPrototypeOf(target) === Object.prototype
-  );
+  if (!target) {
+    return true; // If the target is null or undefined, return true, meaning object is empty
+  }
+
+  return Object.keys(target).length === 0;
 };
