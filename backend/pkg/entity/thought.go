@@ -27,9 +27,10 @@ type ThoughtCreateResponse struct {
 }
 
 type ThoughtMetadataResponse struct {
-	Lifetime    string    `json:"lifetime" db:"lifetime"`
-	IsBurned    bool      `json:"isBurned" db:"is_burned"`
-	CreatedDate time.Time `json:"createdDate" db:"created_date"`
+	Lifetime              string    `json:"lifetime" db:"lifetime"`
+	AbbreviatedThoughtKey string    `json:"abbreviatedThoughtKey" db:"abbreviated_thought_key"`
+	IsBurned              bool      `json:"isBurned" db:"is_burned"`
+	CreatedDate           time.Time `json:"createdDate" db:"created_date"`
 }
 
 // TODO: To implement Status table, with id, status, and time when status was changed

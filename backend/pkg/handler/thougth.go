@@ -40,6 +40,15 @@ func (h *Handler) Create(c *gin.Context) {
 func (h *Handler) RetrieveMetadata(c *gin.Context) {
 	metadataKey := c.Param("id")
 
+	exists, err := h.services.Thought.CheckMetadataExists(metadataKey)
+	if err != nil || !exists {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, map[string]interface{}{
+			"message": "Such thought does not exists",
+			"error":   err.Error(),
+		})
+		return
+	}
+
 	thoughtMetadata, err := h.services.Thought.RetrieveMetadata(metadataKey)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, map[string]interface{}{

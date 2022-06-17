@@ -30,7 +30,7 @@ func (r *ThoughtSql) Create(input entity.ThoughtCreateInput) (entity.ThoughtCrea
 func (r *ThoughtSql) RetrieveMetadata(metadataKey string) (entity.ThoughtMetadataResponse, error) {
 	var thoughtMetadata entity.ThoughtMetadataResponse
 
-	thoughtMetadataQuery := "SELECT th.lifetime, th.is_burned, th.created_date, th.thought_key FROM thoughts th WHERE th.metadata_key = $1"
+	thoughtMetadataQuery := "SELECT th.lifetime, th.is_burned, th.created_date, th.thought_key as abbreviated_thought_key FROM thoughts th WHERE th.metadata_key = $1"
 	err := r.db.Get(&thoughtMetadata, thoughtMetadataQuery, metadataKey)
 
 	return thoughtMetadata, err
@@ -40,6 +40,19 @@ func (r *ThoughtSql) CheckThoughtExists(thoughtKey string) (bool, error) {
 	var exists bool
 	query := "SELECT exists(SELECT th.id FROM thoughts th WHERE th.thought_key = $1);"
 	row := r.db.QueryRow(query, thoughtKey)
+
+	err := row.Scan(&exists)
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
+}
+
+func (r *ThoughtSql) CheckMetadataExists(metadataKey string) (bool, error) {
+	var exists bool
+	query := "SELECT exists(SELECT th.id FROM thoughts th WHERE th.metadata_key= $1);"
+	row := r.db.QueryRow(query, metadataKey)
 
 	err := row.Scan(&exists)
 	if err != nil {

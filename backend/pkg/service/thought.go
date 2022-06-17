@@ -28,11 +28,17 @@ func (s *ThoughtService) Create(input entity.ThoughtCreateInput) (entity.Thought
 }
 
 func (s *ThoughtService) RetrieveMetadata(metadataKey string) (entity.ThoughtMetadataResponse, error) {
-	return s.repo.RetrieveMetadata(metadataKey)
+	response, err := s.repo.RetrieveMetadata(metadataKey)
+	response.AbbreviatedThoughtKey = response.AbbreviatedThoughtKey[:6]
+	return response, err
 }
 
 func (s *ThoughtService) CheckThoughtExists(thoughtKey string) (bool, error) {
 	return s.repo.CheckThoughtExists(thoughtKey)
+}
+
+func (s *ThoughtService) CheckMetadataExists(metadataKey string) (bool, error) {
+	return s.repo.CheckThoughtExists(metadataKey)
 }
 
 func (s *ThoughtService) RetrieveThought(thoughtKey, passphrase string) (entity.ThoughtPassphraseInput, error) {
