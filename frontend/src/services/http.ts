@@ -36,5 +36,5 @@ export const api = {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify(body)
-    }).then(async (response) => (await response.json()) as K)
+    }).then((response) => handleErrors<K>(response))
 };

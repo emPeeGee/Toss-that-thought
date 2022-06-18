@@ -85,25 +85,35 @@ export function ThoughtMetadata() {
           This message is encrypted with your passphrase.
         </Code>
       </Paper>
-      <Grid align="center" mx={0} my="lg">
-        <Text size="xl" weight="500">
-          Expires in {getDateUnitRemains(DateUnit.hour, thoughtMetadata?.lifetime)} hours.
-        </Text>
-        <Text color="dimmed" pl="sm">
-          {thoughtMetadata?.lifetime}
-        </Text>
-      </Grid>
-      <Button<typeof Link>
-        to={`/thought/${metadataKey}/burn`}
-        leftIcon={<Bolt size={24} />}
-        variant="light"
-        color="orange"
-        my="lg"
-        fullWidth
-        component={Link}>
-        Burn this thought
-      </Button>
-      {isAdviceAlertVisible && (
+      {!thoughtMetadata?.isBurned && (
+        <Grid align="center" mx={0} my="lg">
+          <Text size="xl" weight="500">
+            Expires in {getDateUnitRemains(DateUnit.hour, thoughtMetadata?.lifetime)} hours.
+          </Text>
+          <Text color="dimmed" pl="sm">
+            {thoughtMetadata?.lifetime}
+          </Text>
+        </Grid>
+      )}
+
+      {thoughtMetadata?.isBurned ? (
+        <Code color="blue" style={{ fontSize: '20px' }}>
+          Burned on a TODO ago. {new Date(thoughtMetadata?.burnedDate?.Time ?? '').toDateString()}
+        </Code>
+      ) : (
+        <Button<typeof Link>
+          to={`/thought/${metadataKey}/burn`}
+          leftIcon={<Bolt size={24} />}
+          variant="light"
+          color="orange"
+          my="lg"
+          fullWidth
+          component={Link}>
+          Burn this thought
+        </Button>
+      )}
+
+      {!thoughtMetadata?.isBurned && isAdviceAlertVisible && (
         <>
           <Divider my="md" />
           <Alert
