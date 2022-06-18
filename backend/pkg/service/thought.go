@@ -38,24 +38,24 @@ func (s *ThoughtService) CheckThoughtExists(thoughtKey string) (bool, error) {
 }
 
 func (s *ThoughtService) CheckMetadataExists(metadataKey string) (bool, error) {
-	return s.repo.CheckThoughtExists(metadataKey)
+	return s.repo.CheckMetadataExists(metadataKey)
 }
 
-func (s *ThoughtService) RetrieveThought(thoughtKey, passphrase string) (entity.ThoughtPassphraseInput, error) {
-	hashedPassphrase, err := s.repo.GetPassphraseOfThought(thoughtKey)
+func (s *ThoughtService) RetrieveThought(thoughtKey, passphrase string) (entity.ThoughtResponse, error) {
+	hashedPassphrase, err := s.repo.GetPassphraseOfThoughtByThoughtKey(thoughtKey)
 	if err != nil {
-		return entity.ThoughtPassphraseInput{}, err
+		return entity.ThoughtResponse{}, err
 	}
 
 	if CheckPasswordHashes(passphrase, hashedPassphrase) == false {
-		return entity.ThoughtPassphraseInput{}, errors.New("password does not match")
+		return entity.ThoughtResponse{}, errors.New("password does not match")
 	}
 
 	return s.repo.RetrieveThought(thoughtKey, hashedPassphrase)
 }
 
-func (s *ThoughtService) BurnThought(thoughtKey, passphrase string) (bool, error) {
-	hashedPassphrase, err := s.repo.GetPassphraseOfThought(thoughtKey)
+func (s *ThoughtService) BurnThought(metadataKey, passphrase string) (bool, error) {
+	hashedPassphrase, err := s.repo.GetPassphraseOfThoughtByMetadataKey(metadataKey)
 	if err != nil {
 		return false, err
 	}
@@ -64,7 +64,7 @@ func (s *ThoughtService) BurnThought(thoughtKey, passphrase string) (bool, error
 		return false, errors.New("password does not match")
 	}
 
-	return s.repo.BurnThought(thoughtKey, hashedPassphrase)
+	return s.repo.BurnThought(metadataKey, hashedPassphrase)
 }
 
 func HashPassphrase(passphrase string) (string, error) {

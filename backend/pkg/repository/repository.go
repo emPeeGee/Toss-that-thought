@@ -16,11 +16,12 @@ type Authorization interface {
 type Thought interface {
 	Create(input entity.ThoughtCreateInput) (entity.ThoughtCreateResponse, error)
 	RetrieveMetadata(metadataKey string) (entity.ThoughtMetadataResponse, error)
-	RetrieveThought(thoughtKey, passphrase string) (entity.ThoughtPassphraseInput, error)
+	RetrieveThought(thoughtKey, passphrase string) (entity.ThoughtResponse, error)
 	CheckThoughtExists(thoughtKey string) (bool, error)
 	CheckMetadataExists(metadataKey string) (bool, error)
-	BurnThought(thoughtKey, passphrase string) (bool, error)
-	GetPassphraseOfThought(thoughtKey string) (string, error)
+	BurnThought(metadataKey, passphrase string) (bool, error)
+	GetPassphraseOfThoughtByMetadataKey(metadataKey string) (string, error)
+	GetPassphraseOfThoughtByThoughtKey(thoughtKey string) (string, error)
 }
 
 func NewRepository(db *sqlx.DB) *Repository {

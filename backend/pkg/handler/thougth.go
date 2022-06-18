@@ -102,7 +102,6 @@ func (h *Handler) RetrieveThought(c *gin.Context) {
 	}
 
 	accessThoughtResponse, err := h.services.Thought.RetrieveThought(thoughtKey, accessThoughtInput.Passphrase)
-
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, map[string]interface{}{
 			"message": "Incorrect password",
@@ -116,9 +115,9 @@ func (h *Handler) RetrieveThought(c *gin.Context) {
 
 // Dublicated code with checking thought if exists
 func (h *Handler) BurnThought(c *gin.Context) {
-	thoughtKey := c.Param("id")
+	metadataKey := c.Param("id")
 
-	exists, err := h.services.Thought.CheckThoughtExists(thoughtKey)
+	exists, err := h.services.Thought.CheckMetadataExists(metadataKey)
 	if err != nil || !exists {
 		c.AbortWithStatusJSON(http.StatusBadRequest, map[string]interface{}{
 			"message": "Such thought does not exists",
@@ -136,7 +135,7 @@ func (h *Handler) BurnThought(c *gin.Context) {
 		return
 	}
 
-	ok, err := h.services.Thought.BurnThought(thoughtKey, accessThoughtInput.Passphrase)
+	ok, err := h.services.Thought.BurnThought(metadataKey, accessThoughtInput.Passphrase)
 	if err != nil || !ok {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, map[string]interface{}{
 			"message": "Passphrase is incorrect",

@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"errors"
 	"github.com/emPeeee/ttt/pkg/entity"
 	"github.com/jmoiron/sqlx"
 	"github.com/sirupsen/logrus"
@@ -51,32 +52,34 @@ func (r *ThoughtSql) CheckThoughtExists(thoughtKey string) (bool, error) {
 
 func (r *ThoughtSql) CheckMetadataExists(metadataKey string) (bool, error) {
 	var exists bool
-	query := "SELECT exists(SELECT th.id FROM thoughts th WHERE th.metadata_key= $1);"
+	query := "SELECT exists(SELECT th.id FROM thoughts th WHERE th.metadata_key = $1);"
 	row := r.db.QueryRow(query, metadataKey)
 
+	// Did not handle exists response
+	// And made mistakes in which I incurc metadata with thoughtKeu because I did not check
 	err := row.Scan(&exists)
-	if err != nil {
-		return false, err
+	if err != nil || !exists {
+		return false, errors.New("Row does not exist")
 	}
 
 	return true, nil
 }
 
-func (r *ThoughtSql) RetrieveThought(thoughtKey, passphrase string) (entity.ThoughtPassphraseInput, error) {
-	var thoughtResponse entity.ThoughtPassphraseInput
+func (r *ThoughtSql) RetrieveThought(thoughtKey, passphrase string) (entity.ThoughtResponse, error) {
+	var thoughtResponse entity.ThoughtResponse
 	query := "SELECT th.thought from thoughts th WHERE th.thought_key = $1 AND th.passphrase = $2"
 	err := r.db.Get(&thoughtResponse, query, thoughtKey, passphrase)
 
 	if err != nil {
-		return entity.ThoughtPassphraseInput{}, err
+		return entity.ThoughtResponse{}, err
 	}
 
 	return thoughtResponse, nil
 }
 
-func (r *ThoughtSql) BurnThought(thoughtKey, passphrase string) (bool, error) {
-	query := "UPDATE thoughts SET is_burned = true, burned_date = current_timestamp WHERE thought_key = $1 AND passphrase = $2"
-	res, err := r.db.Exec(query, thoughtKey, passphrase)
+func (r *ThoughtSql) BurnThought(metadataKey, passphrase string) (bool, error) {
+	query := "UPDATE thoughts SET is_burned = true, burned_date = current_timestamp WHERE metadata_key = $1 AND passphrase = $2"
+	res, err := r.db.Exec(query, metadataKey, passphrase)
 
 	if err != nil {
 		return false, err
@@ -89,13 +92,26 @@ func (r *ThoughtSql) BurnThought(thoughtKey, passphrase string) (bool, error) {
 }
 
 // TODO: Question, it is normal to create separate query for getting passoword hash? It is used just internally
-func (r *ThoughtSql) GetPassphraseOfThought(thoughtKey string) (string, error) {
-	query := "SELECT th.passphrase from thoughts th WHERE th.thought_key = $1"
+func (r *ThoughtSql) GetPassphraseOfThoughtByMetadataKey(metadataKey string) (string, error) {
+	query := "SELECT th.passphrase from thoughts th WHERE th.metadata_key = $1"
+	row := r.db.QueryRow(query, metadataKey)
+
+	var hashedPassphrase string
+	err := row.Scan(&hashedPassphrase)
+
+	if err != nil {
+		return "", err
+	}
+
+	return hashedPassphrase, nil
+}
+
+func (r *ThoughtSql) GetPassphraseOfThoughtByThoughtKey(thoughtKey string) (string, error) {
+	query := "SELECT th.passphrase from thoughts th WHERE th.thought_key= $1"
 	row := r.db.QueryRow(query, thoughtKey)
 
 	var hashedPassphrase string
 	err := row.Scan(&hashedPassphrase)
-	logrus.Info(hashedPassphrase)
 
 	if err != nil {
 		return "", err
