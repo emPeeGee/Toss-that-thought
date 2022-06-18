@@ -15,17 +15,20 @@ CREATE TABLE users
     registered_at TIMESTAMP    NOT NULL DEFAULT NOW()
 );
 
+
 CREATE TABLE thoughts
 (
-    id            serial PRIMARY KEY unique,
-    thought       VARCHAR      NOT NULL,
-    passphrase    VARCHAR(255) NOT NULL,
-    lifetime      TIMESTAMP    NOT NULL,
-    created_date  TIMESTAMP DEFAULT current_timestamp,
-    is_burned     BOOL      DEFAULT FALSE,
-    burned_date   TIMESTAMP DEFAULT NULL,
-    metadata_key  UUID      default uuid_generate_v4(),
-    thought_key   uuid      default uuid_generate_v4()
+    id           serial PRIMARY KEY unique,
+    thought      VARCHAR      NOT NULL,
+    passphrase   VARCHAR(255) NOT NULL,
+    lifetime     TIMESTAMP    NOT NULL,
+    created_date TIMESTAMP DEFAULT current_timestamp,
+    is_burned    BOOL      DEFAULT FALSE,
+    is_viewed    BOOL      DEFAULT FALSE,
+    burned_date  TIMESTAMP DEFAULT NULL,
+    viewed_date  TIMESTAMP DEFAULT NULL,
+    metadata_key UUID      default uuid_generate_v4(),
+    thought_key  uuid      default uuid_generate_v4()
 );
 -- Excluded status and recepients
 
@@ -36,5 +39,5 @@ CREATE TABLE users_thoughts
     thought_id int references thoughts (id) on delete cascade not null
 );
 
-INSERT INTO thoughts (thought, passphrase, lifetime)
-VALUES ('It is a secret', 'hello', timestamp '2022-11-11 15:00:00')
+-- INSERT INTO thoughts (thought, passphrase, lifetime)
+-- VALUES ('It is a secret', 'hello', timestamp '2022-11-11 15:00:00')

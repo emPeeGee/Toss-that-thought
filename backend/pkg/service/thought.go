@@ -55,12 +55,21 @@ func (s *ThoughtService) RetrieveThought(thoughtKey, passphrase string) (entity.
 }
 
 func (s *ThoughtService) BurnThought(metadataKey, passphrase string) (bool, error) {
+	thoughtMetadata, err := s.repo.RetrieveMetadata(metadataKey)
+	if err != nil {
+		return false, err
+	}
+
+	if thoughtMetadata.IsBurned {
+		return false, errors.New("thought is already burned")
+	}
+
 	hashedPassphrase, err := s.repo.GetPassphraseOfThoughtByMetadataKey(metadataKey)
 	if err != nil {
 		return false, err
 	}
 
-	if CheckPasswordHashes(passphrase, hashedPassphrase) == false {
+	if len(hashedPassphrase) != 0 && CheckPasswordHashes(passphrase, hashedPassphrase) == false {
 		return false, errors.New("password does not match")
 	}
 

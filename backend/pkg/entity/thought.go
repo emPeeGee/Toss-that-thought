@@ -1,6 +1,7 @@
 package entity
 
 import (
+	"github.com/lib/pq"
 	"time"
 )
 
@@ -27,21 +28,28 @@ type ThoughtCreateResponse struct {
 }
 
 type ThoughtMetadataResponse struct {
-	Lifetime              string    `json:"lifetime" db:"lifetime"`
-	AbbreviatedThoughtKey string    `json:"abbreviatedThoughtKey" db:"abbreviated_thought_key"`
-	IsBurned              bool      `json:"isBurned" db:"is_burned"`
-	CreatedDate           time.Time `json:"createdDate" db:"created_date"`
+	Lifetime              string      `json:"lifetime" db:"lifetime"`
+	AbbreviatedThoughtKey string      `json:"abbreviatedThoughtKey" db:"abbreviated_thought_key"`
+	IsBurned              bool        `json:"isBurned" db:"is_burned"`
+	BurnedDate            pq.NullTime `json:"burnedDate" db:"burned_date"`
+	IsViewed              bool        `json:"isViewed" db:"is_viewed"`
+	ViewedDate            pq.NullTime `json:"viewedDate" db:"viewed_date"`
+	CreatedDate           time.Time   `json:"createdDate" db:"created_date"`
 }
 
 // TODO: To implement Status table, with id, status, and time when status was changed
 // TODO: Passphrase should be encrypted
+// TODO: Numbers of views with details, such date of view(many to many)?
+// TODO: Rate limit of burning and thought
 type Thought struct {
 	Id          int       `json:"id" db:"id"`
 	Thought     string    `json:"thought" db:"thought" validate:"required"`
 	Passphrase  string    `json:"passphrase" db:"passphrase" validate:"required"`
 	Lifetime    string    `json:"lifetime" db:"lifetime" validate:"required"`
 	IsBurned    bool      `json:"isBurned" db:"is_burned"`
-	TimeBurned  time.Time `json:"timeBurned" db:"time_burned"`
+	IsViewed    bool      `json:"isViewed" db:"is_viewed"`
+	BurnedDate  time.Time `json:"burnedDate" db:"burned_date"`
+	ViewedDate  time.Time `json:"viewedDate" db:"viewed_date"`
 	CreatedDate time.Time `json:"createdDate" db:"created_date"`
 	MetadataKey string    `json:"metadataKey" db:"metadata_key"`
 	ThoughtKey  string    `json:"thoughtKey" db:"thought_key"`
