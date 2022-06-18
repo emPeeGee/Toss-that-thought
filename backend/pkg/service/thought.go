@@ -5,6 +5,7 @@ import (
 	"github.com/emPeeee/ttt/pkg/entity"
 	"github.com/emPeeee/ttt/pkg/repository"
 	"golang.org/x/crypto/bcrypt"
+	"time"
 )
 
 type ThoughtService struct {
@@ -34,7 +35,19 @@ func (s *ThoughtService) RetrieveMetadata(metadataKey string) (entity.ThoughtMet
 }
 
 func (s *ThoughtService) CheckThoughtExists(thoughtKey string) (bool, error) {
-	return s.repo.CheckThoughtExists(thoughtKey)
+	thoughtValidityInfo, err := s.repo.CheckThoughtExists(thoughtKey)
+	if err != nil {
+		return false, err
+	}
+
+	now := time.Now()
+
+	// if lifetime is passed, or is burned or is viewed return err
+	if now.After(thoughtValidityInfo.Lifetime) || thoughtValidityInfo.IsBurned || thoughtValidityInfo.IsViewed {
+		return false, errors.New("it either never existed or already has been viewed")
+	}
+
+	return true, nil
 }
 
 func (s *ThoughtService) CheckMetadataExists(metadataKey string) (bool, error) {
@@ -47,11 +60,20 @@ func (s *ThoughtService) RetrieveThought(thoughtKey, passphrase string) (entity.
 		return entity.ThoughtResponse{}, err
 	}
 
-	if CheckPasswordHashes(passphrase, hashedPassphrase) == false {
+	if len(hashedPassphrase) != 0 && CheckPasswordHashes(passphrase, hashedPassphrase) == false {
 		return entity.ThoughtResponse{}, errors.New("password does not match")
 	}
 
-	return s.repo.RetrieveThought(thoughtKey, hashedPassphrase)
+	thoughtResponse, err := s.repo.RetrieveThought(thoughtKey, hashedPassphrase)
+	if err != nil {
+		return entity.ThoughtResponse{}, err
+	}
+
+	if err := s.repo.MarkAsViewed(thoughtKey, hashedPassphrase); err != nil {
+		return entity.ThoughtResponse{}, errors.New("something went wrong")
+	}
+
+	return thoughtResponse, nil
 }
 
 func (s *ThoughtService) BurnThought(metadataKey, passphrase string) (bool, error) {

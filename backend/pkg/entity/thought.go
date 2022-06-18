@@ -20,6 +20,13 @@ type ThoughtResponse struct {
 	Thought string `json:"thought" db:"thought"`
 }
 
+type ThoughtValidityInformation struct {
+	ThoughtKey string    `json:"thoughtKey" db:"thought_key"`
+	IsBurned   bool      `json:"isBurned" db:"is_burned"`
+	Lifetime   time.Time `json:"lifetime" db:"lifetime"`
+	IsViewed   bool      `json:"isViewed" db:"is_viewed"`
+}
+
 type ThoughtCreateResponse struct {
 	MetadataKey string    `json:"metadataKey" db:"metadata_key"`
 	ThoughtKey  string    `json:"thoughtKey" db:"thought_key"`

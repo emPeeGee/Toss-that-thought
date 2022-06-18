@@ -37,17 +37,16 @@ func (r *ThoughtSql) RetrieveMetadata(metadataKey string) (entity.ThoughtMetadat
 	return thoughtMetadata, err
 }
 
-func (r *ThoughtSql) CheckThoughtExists(thoughtKey string) (bool, error) {
-	var exists bool
-	query := "SELECT exists(SELECT th.id FROM thoughts th WHERE th.thought_key = $1);"
-	row := r.db.QueryRow(query, thoughtKey)
+func (r *ThoughtSql) CheckThoughtExists(thoughtKey string) (entity.ThoughtValidityInformation, error) {
+	var thoughtValidityInfo entity.ThoughtValidityInformation
+	query := "SELECT th.thought_key, th.lifetime, th.is_burned, is_viewed FROM thoughts th WHERE th.thought_key = $1;"
+	err := r.db.Get(&thoughtValidityInfo, query, thoughtKey)
 
-	err := row.Scan(&exists)
-	if err != nil || !exists {
-		return false, errors.New("Row does not exist")
+	if err != nil {
+		return entity.ThoughtValidityInformation{}, err
 	}
 
-	return true, nil
+	return thoughtValidityInfo, nil
 }
 
 func (r *ThoughtSql) CheckMetadataExists(metadataKey string) (bool, error) {
@@ -76,6 +75,18 @@ func (r *ThoughtSql) RetrieveThought(thoughtKey, passphrase string) (entity.Thou
 	}
 
 	return thoughtResponse, nil
+}
+
+func (r *ThoughtSql) MarkAsViewed(thoughtKey, passphrase string) error {
+	query := "UPDATE thoughts SET is_viewed = true, viewed_date = current_timestamp WHERE thought_key = $1 AND passphrase = $2"
+	res, err := r.db.Exec(query, thoughtKey, passphrase)
+	rowsAffected, _ := res.RowsAffected()
+
+	if err != nil || rowsAffected <= 0 {
+		return errors.New("server error")
+	}
+
+	return nil
 }
 
 func (r *ThoughtSql) BurnThought(metadataKey, passphrase string) (bool, error) {

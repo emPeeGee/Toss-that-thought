@@ -34,7 +34,7 @@ func (h *Handler) InitializeRoutes() *gin.Engine {
 	{
 		api.POST("/create", h.Create) // Good to rename endpoint
 		api.GET("/metadata/:id", h.RetrieveMetadata)
-		api.GET("/thought/:id", h.ThoughtExists)
+		api.GET("/thought/:id", h.ThoughtValidity)
 		api.POST("/thought/:id", h.RetrieveThought)
 		api.POST("/thought/:id/burn", h.BurnThought)
 	}

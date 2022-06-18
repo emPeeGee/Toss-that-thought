@@ -61,13 +61,11 @@ func (h *Handler) RetrieveMetadata(c *gin.Context) {
 	c.JSON(http.StatusOK, thoughtMetadata)
 }
 
-// ThoughtExists I don't really like this name
-// But i frontend I should say that thought does not exist or is burned
-func (h *Handler) ThoughtExists(c *gin.Context) {
+func (h *Handler) ThoughtValidity(c *gin.Context) {
 	thoughtKey := c.Param("id")
 
-	exists, err := h.services.Thought.CheckThoughtExists(thoughtKey)
-	if err != nil {
+	isValid, err := h.services.Thought.CheckThoughtExists(thoughtKey)
+	if err != nil || !isValid {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, map[string]interface{}{
 			"message": "Such thought does not exists",
 			"error":   err.Error(),
@@ -76,10 +74,12 @@ func (h *Handler) ThoughtExists(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, map[string]interface{}{
-		"ok": exists,
+		"ok": isValid,
 	})
 }
 
+// TODO: isValid -> exists
+// rename
 func (h *Handler) RetrieveThought(c *gin.Context) {
 	thoughtKey := c.Param("id")
 
