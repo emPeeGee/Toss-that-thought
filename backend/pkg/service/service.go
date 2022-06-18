@@ -24,7 +24,7 @@ type Thought interface {
 	Create(input entity.ThoughtCreateInput) (entity.ThoughtCreateResponse, error)
 	RetrieveMetadata(metadataKey string) (entity.ThoughtMetadataResponse, error)
 	RetrieveThought(thoughtKey, passphrase string) (entity.ThoughtResponse, error)
-	CheckThoughtExists(thoughtKey string) (bool, error)
+	IsThoughtValid(thoughtKey string) (bool, error)
 	CheckMetadataExists(metadataKey string) (bool, error)
 	BurnThought(metadataKey, passphrase string) (bool, error)
 }

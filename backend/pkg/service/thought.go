@@ -34,8 +34,8 @@ func (s *ThoughtService) RetrieveMetadata(metadataKey string) (entity.ThoughtMet
 	return response, err
 }
 
-func (s *ThoughtService) CheckThoughtExists(thoughtKey string) (bool, error) {
-	thoughtValidityInfo, err := s.repo.CheckThoughtExists(thoughtKey)
+func (s *ThoughtService) IsThoughtValid(thoughtKey string) (bool, error) {
+	thoughtValidityInfo, err := s.repo.RetrieveThoughtValidity(thoughtKey)
 	if err != nil {
 		return false, err
 	}

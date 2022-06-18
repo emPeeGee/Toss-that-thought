@@ -64,10 +64,10 @@ func (h *Handler) RetrieveMetadata(c *gin.Context) {
 func (h *Handler) ThoughtValidity(c *gin.Context) {
 	thoughtKey := c.Param("id")
 
-	isValid, err := h.services.Thought.CheckThoughtExists(thoughtKey)
+	isValid, err := h.services.Thought.IsThoughtValid(thoughtKey)
 	if err != nil || !isValid {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, map[string]interface{}{
-			"message": "Such thought does not exists",
+			"message": "thought it either never existed or already has been viewed",
 			"error":   err.Error(),
 		})
 		return
@@ -78,15 +78,13 @@ func (h *Handler) ThoughtValidity(c *gin.Context) {
 	})
 }
 
-// TODO: isValid -> exists
-// rename
 func (h *Handler) RetrieveThought(c *gin.Context) {
 	thoughtKey := c.Param("id")
 
-	exists, err := h.services.Thought.CheckThoughtExists(thoughtKey)
-	if err != nil || !exists {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, map[string]interface{}{
-			"message": "Such thought does not exists",
+	isValid, err := h.services.Thought.IsThoughtValid(thoughtKey)
+	if err != nil || !isValid {
+		c.AbortWithStatusJSON(http.StatusBadRequest, map[string]interface{}{
+			"message": "thought it either never existed or already has been viewed",
 			"error":   err.Error(),
 		})
 		return
@@ -94,8 +92,8 @@ func (h *Handler) RetrieveThought(c *gin.Context) {
 
 	var accessThoughtInput entity.ThoughtPassphraseInput
 	if err := c.BindJSON(&accessThoughtInput); err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, map[string]interface{}{
-			"message": "Such thought does not exists",
+		c.AbortWithStatusJSON(http.StatusBadRequest, map[string]interface{}{
+			"message": "the provided body is incorrect",
 			"error":   err.Error(),
 		})
 		return

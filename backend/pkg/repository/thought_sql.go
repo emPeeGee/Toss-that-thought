@@ -37,7 +37,7 @@ func (r *ThoughtSql) RetrieveMetadata(metadataKey string) (entity.ThoughtMetadat
 	return thoughtMetadata, err
 }
 
-func (r *ThoughtSql) CheckThoughtExists(thoughtKey string) (entity.ThoughtValidityInformation, error) {
+func (r *ThoughtSql) RetrieveThoughtValidity(thoughtKey string) (entity.ThoughtValidityInformation, error) {
 	var thoughtValidityInfo entity.ThoughtValidityInformation
 	query := "SELECT th.thought_key, th.lifetime, th.is_burned, is_viewed FROM thoughts th WHERE th.thought_key = $1;"
 	err := r.db.Get(&thoughtValidityInfo, query, thoughtKey)
