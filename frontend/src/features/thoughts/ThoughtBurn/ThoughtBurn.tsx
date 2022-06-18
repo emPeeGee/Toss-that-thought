@@ -6,24 +6,18 @@ import {
   Divider,
   LoadingOverlay,
   PasswordInput,
-  Text,
   Title
 } from '@mantine/core';
 import { useForm } from 'react-hook-form';
 import { ArrowBackUp, Bolt, Lock } from 'tabler-icons-react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { api } from 'services/http';
-import { isObjectEmpty } from 'utils/is-empty';
-import { ThoughtBurnRequest, ThoughtMetadataModel } from '../thought.model';
+import { ThoughtPassphraseRequest, ThoughtMetadataModel } from '../thought.model';
 
 // TODO: Parse date
 export function ThoughtBurn() {
   const navigate = useNavigate();
-  const {
-    register,
-    handleSubmit,
-    formState: { errors }
-  } = useForm<ThoughtBurnRequest>({
+  const { register, handleSubmit } = useForm<ThoughtPassphraseRequest>({
     mode: 'onChange'
   });
   const { metadataKey } = useParams();
@@ -44,7 +38,7 @@ export function ThoughtBurn() {
       .finally(() => setIsLoading(false));
   }, [metadataKey]);
 
-  const burnThought = (data: ThoughtBurnRequest) => {
+  const burnThought = (data: ThoughtPassphraseRequest) => {
     setIsLoading(true);
     setIsBurnError(false);
 
@@ -144,11 +138,9 @@ export function ThoughtBurn() {
           variant="light"
           color="orange"
           leftIcon={<Bolt size={24} />}
-          onClick={handleSubmit(burnThought)}
-          disabled={!isObjectEmpty(errors)}>
+          onClick={handleSubmit(burnThought)}>
           Burn this thought
         </Button>
-        {errors.passphrase && <Text color="red">Passphrase is required</Text>}
       </Container>
       <Button<typeof Link>
         component={Link}

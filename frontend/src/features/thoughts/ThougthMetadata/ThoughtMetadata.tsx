@@ -56,6 +56,7 @@ export function ThoughtMetadata() {
     );
   }
 
+  // TODO: fix bug when on create, abbreviated is not provided
   return (
     <Container my="xl">
       <LoadingOverlay visible={isLoading} />

@@ -22,6 +22,10 @@ export interface ThoughtCreateRequest {
   lifetime: string;
 }
 
-export interface ThoughtBurnRequest {
+export interface ThoughtPassphraseRequest {
   passphrase: string;
+}
+
+export interface ThoughtResponse {
+  thought: string;
 }

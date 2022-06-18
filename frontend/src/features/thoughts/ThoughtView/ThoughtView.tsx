@@ -1,19 +1,65 @@
-import React, { useState } from 'react';
-import { Alert, Button, Container, Divider, Text, Textarea, TextInput } from '@mantine/core';
-import { ArrowForwardUp, Eye } from 'tabler-icons-react';
-import { Link } from 'react-router-dom';
-// import { useParams } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import {
+  Alert,
+  Button,
+  Container,
+  Divider,
+  LoadingOverlay,
+  PasswordInput,
+  Text,
+  Textarea
+} from '@mantine/core';
+import { ArrowForwardUp, Eye, Lock } from 'tabler-icons-react';
+import { useForm } from 'react-hook-form';
+import { Link, useParams } from 'react-router-dom';
+import { api } from 'services/http';
+import { ThoughtPassphraseRequest, ThoughtResponse } from '../thought.model';
 
 export function ThoughtView() {
-  // const { thoughtKey} = useParams();
+  const { register, handleSubmit } = useForm<ThoughtPassphraseRequest>({
+    mode: 'onChange'
+  });
+  const { thoughtKey } = useParams();
   const [isCarefulAlertVisible, setIsCarefulAlertVisible] = useState(true);
-  const [isThoughtValid] = useState(true);
+  const [isError, setIsError] = useState(false);
+  const [isPassphrasePhasePassed, setIsPassphrasePhasePassed] = useState(false);
   const [isPassphraseCorrect, setIsPassphraseCorrect] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+  const [thought, setThought] = useState('');
 
-  if (!isThoughtValid) {
+  useEffect(() => {
+    setIsLoading(true);
+    api
+      .get({ url: `thought/${thoughtKey}` })
+      .catch((err) => {
+        console.log(err);
+        setIsError(true);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  }, []);
+
+  const viewThought = (data: ThoughtPassphraseRequest) => {
+    setIsLoading(true);
+
+    api
+      .post<ThoughtPassphraseRequest, ThoughtResponse>({ url: `thought/${thoughtKey}`, body: data })
+      .then((response) => {
+        setThought(response.thought);
+        setIsPassphrasePhasePassed(true);
+      })
+      .catch((err) => {
+        console.log(err);
+        setIsPassphraseCorrect(false);
+      })
+      .finally(() => setIsLoading(false));
+  };
+
+  if (isError) {
     return (
       <Container size="md" my="xl">
-        <Alert color="red" title="Hmmm">
+        <Alert color="red" title="Hmm">
           It either never existed or has already been viewed.
         </Alert>
       </Container>
@@ -22,7 +68,8 @@ export function ThoughtView() {
 
   return (
     <Container size="md" my="xl">
-      {isPassphraseCorrect ? (
+      <LoadingOverlay visible={isLoading} />
+      {isPassphrasePhasePassed ? (
         <>
           <Textarea
             disabled
@@ -30,7 +77,7 @@ export function ThoughtView() {
             variant="filled"
             size="xl"
             my="xl"
-            value="Lorem"
+            value={thought}
           />
           <Button<typeof Link>
             to="/"
@@ -43,15 +90,25 @@ export function ThoughtView() {
         </>
       ) : (
         <>
-          <Text size="xl">This thought requires a passphrase:</Text>
-          <TextInput variant="filled" my="md" placeholder="Enter your passphrase here" />
-          <Button
-            fullWidth
-            my="lg"
-            leftIcon={<Eye size={24} />}
-            onClick={() => setIsPassphraseCorrect(true)}>
-            View thought
-          </Button>
+          {!isPassphraseCorrect && (
+            <Alert title="Oops..." color="red" my="lg">
+              Double check that passphrase
+            </Alert>
+          )}
+
+          <form onSubmit={handleSubmit(viewThought)}>
+            <Text size="xl">This thought requires a passphrase:</Text>
+            <PasswordInput
+              {...register('passphrase', { required: false, value: '' })}
+              my="md"
+              placeholder="Enter passphrase here"
+              toggleTabIndex={0}
+              icon={<Lock size={16} />}
+            />
+            <Button fullWidth my="lg" variant="light" leftIcon={<Eye size={24} />} type="submit">
+              View thought
+            </Button>
+          </form>
         </>
       )}
 
