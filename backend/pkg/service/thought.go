@@ -28,10 +28,18 @@ func (s *ThoughtService) Create(input entity.ThoughtCreateInput) (entity.Thought
 	return s.repo.Create(input)
 }
 
+// TODO: more linter
 func (s *ThoughtService) RetrieveMetadata(metadataKey string) (entity.ThoughtMetadataResponse, error) {
-	response, err := s.repo.RetrieveMetadata(metadataKey)
-	response.AbbreviatedThoughtKey = response.AbbreviatedThoughtKey[:6]
-	return response, err
+	metadata, err := s.repo.RetrieveMetadata(metadataKey)
+	if err == nil {
+		metadata.AbbreviatedThoughtKey = metadata.AbbreviatedThoughtKey[:6]
+	}
+
+	if time.Now().After(metadata.Lifetime) {
+		return entity.ThoughtMetadataResponse{}, errors.New("it either never existed or already has been viewed")
+	}
+
+	return metadata, err
 }
 
 func (s *ThoughtService) IsThoughtValid(thoughtKey string) (bool, error) {
@@ -84,6 +92,10 @@ func (s *ThoughtService) BurnThought(metadataKey, passphrase string) (bool, erro
 
 	if thoughtMetadata.IsBurned {
 		return false, errors.New("thought is already burned")
+	}
+
+	if time.Now().After(thoughtMetadata.Lifetime) {
+		return false, errors.New("cannot burn, lifetime passed")
 	}
 
 	hashedPassphrase, err := s.repo.GetPassphraseOfThoughtByMetadataKey(metadataKey)

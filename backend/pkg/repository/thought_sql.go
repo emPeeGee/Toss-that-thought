@@ -15,7 +15,6 @@ func NewThoughtSql(db *sqlx.DB) *ThoughtSql {
 	return &ThoughtSql{db: db}
 }
 
-// TODO: If there is no passphrase when what to send to front?
 func (r *ThoughtSql) Create(input entity.ThoughtCreateInput) (entity.ThoughtCreateResponse, error) {
 	var thoughtResponse entity.ThoughtCreateResponse
 	createThoughtQuery := `INSERT INTO thoughts(thought, passphrase, lifetime) VALUES ($1, $2, $3) RETURNING metadata_key, thought_key, is_burned, lifetime`

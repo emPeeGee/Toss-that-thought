@@ -35,7 +35,7 @@ type ThoughtCreateResponse struct {
 }
 
 type ThoughtMetadataResponse struct {
-	Lifetime              string      `json:"lifetime" db:"lifetime"`
+	Lifetime              time.Time   `json:"lifetime" db:"lifetime"`
 	AbbreviatedThoughtKey string      `json:"abbreviatedThoughtKey" db:"abbreviated_thought_key"`
 	IsBurned              bool        `json:"isBurned" db:"is_burned"`
 	BurnedDate            pq.NullTime `json:"burnedDate" db:"burned_date"`
@@ -52,7 +52,7 @@ type Thought struct {
 	Id          int       `json:"id" db:"id"`
 	Thought     string    `json:"thought" db:"thought" validate:"required"`
 	Passphrase  string    `json:"passphrase" db:"passphrase" validate:"required"`
-	Lifetime    string    `json:"lifetime" db:"lifetime" validate:"required"`
+	Lifetime    time.Time `json:"lifetime" db:"lifetime" validate:"required"`
 	IsBurned    bool      `json:"isBurned" db:"is_burned"`
 	IsViewed    bool      `json:"isViewed" db:"is_viewed"`
 	BurnedDate  time.Time `json:"burnedDate" db:"burned_date"`
