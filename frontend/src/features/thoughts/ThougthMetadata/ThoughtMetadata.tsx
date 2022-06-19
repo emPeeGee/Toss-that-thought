@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 import React, { useEffect, useState } from 'react';
 import {
   Alert,
@@ -86,50 +87,61 @@ export function ThoughtMetadata() {
           This message is encrypted with your passphrase.
         </Code>
       </Paper>
-      {!thoughtMetadata?.isBurned && (
+
+      {thoughtMetadata?.isViewed ? (
         <Grid align="center" mx={0} my="lg">
           <Text size="xl" weight="500">
-            Expires in {getDateUnitRemains(DateUnit.hour, thoughtMetadata?.lifetime)} hours.
+            Viewed {getDateUnitRemains(DateUnit.minute, thoughtMetadata?.viewedDate?.Time)} minutes
+            ago.
           </Text>
           <Text color="dimmed" pl="sm">
-            {thoughtMetadata?.lifetime}
+            {thoughtMetadata?.viewedDate?.Time}
           </Text>
         </Grid>
-      )}
-
-      {thoughtMetadata?.isBurned ? (
+      ) : thoughtMetadata?.isBurned ? (
         <Code color="blue" style={{ fontSize: '20px' }}>
           Burned on a TODO ago. {new Date(thoughtMetadata?.burnedDate?.Time ?? '').toDateString()}
         </Code>
       ) : (
-        <Button<typeof Link>
-          to={`/thought/${metadataKey}/burn`}
-          leftIcon={<Bolt size={24} />}
-          variant="light"
-          color="orange"
-          my="lg"
-          fullWidth
-          component={Link}>
-          Burn this thought
-        </Button>
-      )}
-
-      {!thoughtMetadata?.isBurned && isAdviceAlertVisible && (
         <>
-          <Divider my="md" />
-          <Alert
-            color="violet"
-            withCloseButton
-            title="Advice"
-            onClose={() => {
-              setIsAdviceAlertVisible(false);
-            }}
-            closeButtonLabel="Close advice">
-            Burning a thought will delete it before it has been read (click to confirm).
-          </Alert>
-          <Divider my="md" />
+          <Grid align="center" mx={0} my="lg">
+            <Text size="xl" weight="500">
+              Expires in {getDateUnitRemains(DateUnit.hour, thoughtMetadata?.lifetime)} hours.
+            </Text>
+            <Text color="dimmed" pl="sm">
+              {thoughtMetadata?.lifetime}
+            </Text>
+          </Grid>
+          <Button<typeof Link>
+            to={`/thought/${metadataKey}/burn`}
+            leftIcon={<Bolt size={24} />}
+            variant="light"
+            color="orange"
+            my="lg"
+            fullWidth
+            component={Link}>
+            Burn this thought
+          </Button>
+
+          {isAdviceAlertVisible && (
+            <>
+              <Divider my="md" />
+              <Alert
+                color="violet"
+                withCloseButton
+                title="Advice"
+                onClose={() => {
+                  setIsAdviceAlertVisible(false);
+                }}
+                closeButtonLabel="Close advice">
+                Burning a thought will delete it before it has been read (click to confirm).
+              </Alert>
+              <Divider my="md" />
+            </>
+          )}
         </>
       )}
+
       <Button<typeof Link>
         to="/"
         leftIcon={<MessageCircle2 size={24} />}

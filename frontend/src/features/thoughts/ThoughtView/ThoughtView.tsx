@@ -15,6 +15,9 @@ import { Link, useParams } from 'react-router-dom';
 import { api } from 'services/http';
 import { ThoughtPassphraseRequest, ThoughtResponse } from '../thought.model';
 
+// TODO: A bug or a feature? When I burn a thought, but have a page with view thought,
+// if I enter password, it says that password is not correct, but on refresh,
+// it says it does not exists, the same for burn view
 export function ThoughtView() {
   const { register, handleSubmit } = useForm<ThoughtPassphraseRequest>({
     mode: 'onChange'
