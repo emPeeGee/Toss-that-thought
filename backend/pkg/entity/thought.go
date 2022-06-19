@@ -5,11 +5,17 @@ import (
 	"time"
 )
 
-// Todo: Rename with Create suffix
 type ThoughtCreateInput struct {
 	Thought    string    `json:"thought" db:"thought" validate:"required"`
 	Passphrase string    `json:"passphrase" db:"passphrase" validate:"max=255"`
 	Lifetime   time.Time `json:"lifetime" db:"lifetime" validate:"required"`
+}
+
+type ThoughtCreateResponse struct {
+	MetadataKey string    `json:"metadataKey" db:"metadata_key"`
+	ThoughtKey  string    `json:"thoughtKey" db:"thought_key"`
+	IsBurned    bool      `json:"isBurned" db:"is_burned"`
+	Lifetime    time.Time `json:"lifetime" db:"lifetime" validate:"required"`
 }
 
 type ThoughtPassphraseInput struct {
@@ -27,13 +33,6 @@ type ThoughtValidityInformation struct {
 	IsViewed   bool      `json:"isViewed" db:"is_viewed"`
 }
 
-type ThoughtCreateResponse struct {
-	MetadataKey string    `json:"metadataKey" db:"metadata_key"`
-	ThoughtKey  string    `json:"thoughtKey" db:"thought_key"`
-	IsBurned    bool      `json:"isBurned" db:"is_burned"`
-	Lifetime    time.Time `json:"lifetime" db:"lifetime" validate:"required"`
-}
-
 type ThoughtMetadataResponse struct {
 	Lifetime              time.Time   `json:"lifetime" db:"lifetime"`
 	AbbreviatedThoughtKey string      `json:"abbreviatedThoughtKey" db:"abbreviated_thought_key"`
@@ -44,8 +43,7 @@ type ThoughtMetadataResponse struct {
 	CreatedDate           time.Time   `json:"createdDate" db:"created_date"`
 }
 
-// TODO: To implement Status table, with id, status, and time when status was changed
-// TODO: Passphrase should be encrypted
+// TODO: To implement Status table, with id, status, and time when status was changed ?
 // TODO: Numbers of views with details, such date of view(many to many)?
 // TODO: Rate limit of burning and thought
 type Thought struct {

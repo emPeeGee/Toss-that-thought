@@ -63,7 +63,6 @@ func (r *ThoughtSql) CheckMetadataExists(metadataKey string) (bool, error) {
 	return true, nil
 }
 
-// TODO: Mark as viewed
 func (r *ThoughtSql) RetrieveThought(thoughtKey, passphrase string) (entity.ThoughtResponse, error) {
 	var thoughtResponse entity.ThoughtResponse
 	query := "SELECT th.thought from thoughts th WHERE th.thought_key = $1 AND th.passphrase = $2"
@@ -102,7 +101,6 @@ func (r *ThoughtSql) BurnThought(metadataKey, passphrase string) (bool, error) {
 	return true, nil
 }
 
-// TODO: Question, it is normal to create separate query for getting passoword hash? It is used just internally
 func (r *ThoughtSql) GetPassphraseOfThoughtByMetadataKey(metadataKey string) (string, error) {
 	query := "SELECT th.passphrase from thoughts th WHERE th.metadata_key = $1"
 	row := r.db.QueryRow(query, metadataKey)
