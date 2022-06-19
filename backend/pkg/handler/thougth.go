@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"github.com/emPeeee/ttt/internal/flaw"
 	"github.com/emPeeee/ttt/pkg/entity"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -10,27 +11,18 @@ func (h *Handler) Create(c *gin.Context) {
 	var input entity.ThoughtCreateInput
 
 	if err := c.BindJSON(&input); err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, map[string]interface{}{
-			"message": "Incorrect input",
-			"error":   err.Error(),
-		})
+		flaw.BadRequest(c, "your request looks incorrect", err.Error())
 		return
 	}
 
 	if err := h.validate.Struct(input); err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, map[string]interface{}{
-			"message": "Validation",
-			"error":   err.Error(),
-		})
+		flaw.BadRequest(c, "your request did not pass validation", err.Error())
 		return
 	}
 
 	thoughtMetadata, err := h.services.Thought.Create(input)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, map[string]interface{}{
-			"message": "Incorrect server",
-			"error":   err.Error(),
-		})
+		flaw.InternalServer(c, "something went wrong, we are working", err.Error())
 		return
 	}
 
@@ -42,19 +34,13 @@ func (h *Handler) RetrieveMetadata(c *gin.Context) {
 
 	exists, err := h.services.Thought.CheckMetadataExists(metadataKey)
 	if err != nil || !exists {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, map[string]interface{}{
-			"message": "Such thought does not exists",
-			"error":   err.Error(),
-		})
+		flaw.NotFound(c, "such thought does not exists", err.Error())
 		return
 	}
 
 	thoughtMetadata, err := h.services.Thought.RetrieveMetadata(metadataKey)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, map[string]interface{}{
-			"message": "SQL error",
-			"error":   err.Error(),
-		})
+		flaw.InternalServer(c, "an error encountered during database", err.Error())
 		return
 	}
 
@@ -66,10 +52,7 @@ func (h *Handler) ThoughtValidity(c *gin.Context) {
 
 	isValid, err := h.services.Thought.IsThoughtValid(thoughtKey)
 	if err != nil || !isValid {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, map[string]interface{}{
-			"message": "thought it either never existed or already has been viewed",
-			"error":   err.Error(),
-		})
+		flaw.NotFound(c, "thought it either never existed or already has been viewed", err.Error())
 		return
 	}
 
@@ -83,28 +66,19 @@ func (h *Handler) RetrieveThought(c *gin.Context) {
 
 	isValid, err := h.services.Thought.IsThoughtValid(thoughtKey)
 	if err != nil || !isValid {
-		c.AbortWithStatusJSON(http.StatusBadRequest, map[string]interface{}{
-			"message": "thought it either never existed or already has been viewed",
-			"error":   err.Error(),
-		})
+		flaw.NotFound(c, "thought it either never existed or already has been viewed", err.Error())
 		return
 	}
 
 	var accessThoughtInput entity.ThoughtPassphraseInput
 	if err := c.BindJSON(&accessThoughtInput); err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, map[string]interface{}{
-			"message": "the provided body is incorrect",
-			"error":   err.Error(),
-		})
+		flaw.BadRequest(c, "your request seems to be incorrect", err.Error())
 		return
 	}
 
 	accessThoughtResponse, err := h.services.Thought.RetrieveThought(thoughtKey, accessThoughtInput.Passphrase)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, map[string]interface{}{
-			"message": "Incorrect password",
-			"error":   err.Error(),
-		})
+		flaw.BadRequest(c, "incorrect password", err.Error())
 		return
 	}
 
@@ -117,28 +91,19 @@ func (h *Handler) BurnThought(c *gin.Context) {
 
 	exists, err := h.services.Thought.CheckMetadataExists(metadataKey)
 	if err != nil || !exists {
-		c.AbortWithStatusJSON(http.StatusBadRequest, map[string]interface{}{
-			"message": "Such thought does not exists",
-			"error":   err.Error(),
-		})
+		flaw.NotFound(c, "such thought does not exists", err.Error())
 		return
 	}
 
 	var accessThoughtInput entity.ThoughtPassphraseInput
 	if err := c.BindJSON(&accessThoughtInput); err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, map[string]interface{}{
-			"message": "Incorrect body",
-			"error":   err.Error(),
-		})
+		flaw.BadRequest(c, "your request seems to be incorrect", err.Error())
 		return
 	}
 
 	ok, err := h.services.Thought.BurnThought(metadataKey, accessThoughtInput.Passphrase)
 	if err != nil || !ok {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, map[string]interface{}{
-			"message": "Passphrase is incorrect",
-			"error":   err.Error(),
-		})
+		flaw.BadRequest(c, "passphrase is incorrect", err.Error())
 		return
 	}
 
