@@ -25,7 +25,12 @@ func (s *ThoughtService) Create(input entity.ThoughtCreateInput) (entity.Thought
 		input.Passphrase = hashedPassphrase
 	}
 
-	return s.repo.Create(input)
+	createdThought, err := s.repo.Create(input)
+	if err == nil {
+		createdThought.AbbreviatedThoughtKey = createdThought.ThoughtKey[:6]
+	}
+
+	return createdThought, err
 }
 
 // TODO: more linter
@@ -90,8 +95,16 @@ func (s *ThoughtService) BurnThought(metadataKey, passphrase string) (bool, erro
 		return false, err
 	}
 
+	if time.Now().After(thoughtMetadata.Lifetime) {
+		return false, errors.New("it either never existed or already has been viewed")
+	}
+
 	if thoughtMetadata.IsBurned {
 		return false, errors.New("thought is already burned")
+	}
+
+	if thoughtMetadata.IsViewed {
+		return false, errors.New("thought is already viewed")
 	}
 
 	if time.Now().After(thoughtMetadata.Lifetime) {

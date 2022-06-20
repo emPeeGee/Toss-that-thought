@@ -12,10 +12,11 @@ type ThoughtCreateInput struct {
 }
 
 type ThoughtCreateResponse struct {
-	MetadataKey string    `json:"metadataKey" db:"metadata_key"`
-	ThoughtKey  string    `json:"thoughtKey" db:"thought_key"`
-	IsBurned    bool      `json:"isBurned" db:"is_burned"`
-	Lifetime    time.Time `json:"lifetime" db:"lifetime" validate:"required"`
+	MetadataKey           string    `json:"metadataKey" db:"metadata_key"`
+	ThoughtKey            string    `json:"thoughtKey" db:"thought_key"`
+	AbbreviatedThoughtKey string    `json:"abbreviatedThoughtKey"`
+	IsBurned              bool      `json:"isBurned" db:"is_burned"`
+	Lifetime              time.Time `json:"lifetime" db:"lifetime" validate:"required"`
 }
 
 type ThoughtPassphraseInput struct {
