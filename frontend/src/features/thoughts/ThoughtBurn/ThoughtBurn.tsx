@@ -12,9 +12,9 @@ import { useForm } from 'react-hook-form';
 import { ArrowBackUp, Bolt, Lock } from 'tabler-icons-react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { api } from 'services/http';
+import { prettyDiffDate } from 'utils/date';
 import { ThoughtPassphraseRequest, ThoughtMetadataModel } from '../thought.model';
 
-// TODO: Parse date
 export function ThoughtBurn() {
   const navigate = useNavigate();
   const { register, handleSubmit } = useForm<ThoughtPassphraseRequest>({
@@ -71,13 +71,13 @@ export function ThoughtBurn() {
     );
   }
 
-  // TODO: Not ready yet, but should be checked when though will be viewed
   // TODO: Kinda redundant with below isBurned
   if (thoughtMetadata?.isViewed) {
     return (
       <Container size="md" my="xl">
         <Alert my="md" color="orange" title="Cannot burn!">
-          The thought was already viewed 3 seconds ago
+          The thought was already viewed {prettyDiffDate(thoughtMetadata.viewedDate?.Time)}.
+          {new Date(thoughtMetadata?.viewedDate?.Time ?? '').toLocaleString()}
         </Alert>
         <Button<typeof Link>
           fullWidth
@@ -92,12 +92,11 @@ export function ThoughtBurn() {
   }
 
   if (thoughtMetadata?.isBurned) {
-    // TODO: More friendly time
     return (
       <Container size="md" my="xl">
         <Alert my="md" color="orange" title="Cannot burn!">
-          The thought was already burned{' '}
-          {new Date(thoughtMetadata?.burnedDate?.Time ?? '').toDateString()}
+          The thought was already burned {prettyDiffDate(thoughtMetadata.burnedDate?.Time)}.{' '}
+          {new Date(thoughtMetadata?.burnedDate?.Time ?? '').toLocaleString()}
         </Alert>
         <Button<typeof Link>
           fullWidth
@@ -111,7 +110,6 @@ export function ThoughtBurn() {
     );
   }
 
-  // TODO: Check empty password flow
   return (
     <Container size="md" my="xl">
       <LoadingOverlay visible={isLoading} />
@@ -121,37 +119,39 @@ export function ThoughtBurn() {
           Double check that passphrase
         </Alert>
       )}
-      <Title order={1} my="lg">
-        Burn thought 🔥
-      </Title>
-      <PasswordInput
-        {...register('passphrase', { required: false, value: '' })}
-        my="md"
-        placeholder="Enter passphrase here"
-        toggleTabIndex={0}
-        icon={<Lock size={16} />}
-      />
+      <form onSubmit={handleSubmit(burnThought)}>
+        <Title order={1} my="lg">
+          Burn thought 🔥
+        </Title>
+        <PasswordInput
+          {...register('passphrase', { required: false, value: '' })}
+          my="md"
+          placeholder="Enter passphrase here"
+          toggleTabIndex={0}
+          icon={<Lock size={16} />}
+        />
 
-      <Container px={0} my="lg">
-        <Button
+        <Container px={0} my="lg">
+          <Button
+            fullWidth
+            variant="light"
+            color="orange"
+            type="submit"
+            leftIcon={<Bolt size={24} />}>
+            Burn this thought
+          </Button>
+        </Container>
+        <Button<typeof Link>
+          component={Link}
+          to={`/metadata/${metadataKey}`}
           fullWidth
-          variant="light"
-          color="orange"
-          leftIcon={<Bolt size={24} />}
-          onClick={handleSubmit(burnThought)}>
-          Burn this thought
+          variant="outline"
+          color="gray"
+          my="lg"
+          leftIcon={<ArrowBackUp size={24} />}>
+          Cancel
         </Button>
-      </Container>
-      <Button<typeof Link>
-        component={Link}
-        to={`/metadata/${metadataKey}`}
-        fullWidth
-        variant="outline"
-        color="gray"
-        my="lg"
-        leftIcon={<ArrowBackUp size={24} />}>
-        Cancel
-      </Button>
+      </form>
 
       {isAdviceAlertVisible && (
         <>

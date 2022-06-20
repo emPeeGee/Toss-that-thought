@@ -16,7 +16,7 @@ import { Link, useLocation, useParams } from 'react-router-dom';
 import { Bolt, MessageCircle2 } from 'tabler-icons-react';
 import { isObjectEmpty } from 'utils/is-empty';
 import { ThoughtMetadataModel } from 'features/thoughts/thought.model';
-import { DateUnit, getDateUnitRemains } from 'utils/date';
+import { DateUnit, getDateDiffIn, prettyDiffDate } from 'utils/date';
 import { api } from 'services/http';
 
 export function ThoughtMetadata() {
@@ -57,7 +57,6 @@ export function ThoughtMetadata() {
     );
   }
 
-  // TODO: fix bug when on create, abbreviated is not provided
   return (
     <Container my="xl">
       <LoadingOverlay visible={isLoading} />
@@ -91,8 +90,7 @@ export function ThoughtMetadata() {
       {thoughtMetadata?.isViewed ? (
         <Grid align="center" mx={0} my="lg">
           <Text size="xl" weight="500">
-            Viewed {getDateUnitRemains(DateUnit.minute, thoughtMetadata?.viewedDate?.Time)} minutes
-            ago.
+            Viewed {getDateDiffIn(DateUnit.minute, thoughtMetadata?.viewedDate?.Time)} minutes ago.
           </Text>
           <Text color="dimmed" pl="sm">
             {thoughtMetadata?.viewedDate?.Time}
@@ -100,13 +98,14 @@ export function ThoughtMetadata() {
         </Grid>
       ) : thoughtMetadata?.isBurned ? (
         <Code color="blue" style={{ fontSize: '20px' }}>
-          Burned on a TODO ago. {new Date(thoughtMetadata?.burnedDate?.Time ?? '').toDateString()}
+          Burned {prettyDiffDate(thoughtMetadata.burnedDate?.Time)}.{' '}
+          {new Date(thoughtMetadata?.burnedDate?.Time ?? '').toLocaleString()}
         </Code>
       ) : (
         <>
           <Grid align="center" mx={0} my="lg">
             <Text size="xl" weight="500">
-              Expires in {getDateUnitRemains(DateUnit.hour, thoughtMetadata?.lifetime)} hours.
+              Expires in {getDateDiffIn(DateUnit.hour, thoughtMetadata?.lifetime)} hours.
             </Text>
             <Text color="dimmed" pl="sm">
               {thoughtMetadata?.lifetime}
