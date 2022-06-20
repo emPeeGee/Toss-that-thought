@@ -44,9 +44,6 @@ type ThoughtMetadataResponse struct {
 	CreatedDate           time.Time   `json:"createdDate" db:"created_date"`
 }
 
-// TODO: To implement Status table, with id, status, and time when status was changed ?
-// TODO: Numbers of views with details, such date of view(many to many)?
-// TODO: Rate limit of burning and thought
 type Thought struct {
 	Id          int       `json:"id" db:"id"`
 	Thought     string    `json:"thought" db:"thought" validate:"required"`

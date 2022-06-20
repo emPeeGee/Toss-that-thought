@@ -2,9 +2,9 @@ package service
 
 import (
 	"errors"
+	"github.com/emPeeee/ttt/pkg/crypt"
 	"github.com/emPeeee/ttt/pkg/entity"
 	"github.com/emPeeee/ttt/pkg/repository"
-	"golang.org/x/crypto/bcrypt"
 	"time"
 )
 
@@ -18,7 +18,7 @@ func NewThoughtService(repo repository.Thought) *ThoughtService {
 
 func (s *ThoughtService) Create(input entity.ThoughtCreateInput) (entity.ThoughtCreateResponse, error) {
 	if len(input.Passphrase) != 0 {
-		hashedPassphrase, err := HashPassphrase(input.Passphrase)
+		hashedPassphrase, err := crypt.HashPassphrase(input.Passphrase)
 		if err != nil {
 			return entity.ThoughtCreateResponse{}, err
 		}
@@ -33,7 +33,6 @@ func (s *ThoughtService) Create(input entity.ThoughtCreateInput) (entity.Thought
 	return createdThought, err
 }
 
-// TODO: more linter
 func (s *ThoughtService) RetrieveMetadata(metadataKey string) (entity.ThoughtMetadataResponse, error) {
 	metadata, err := s.repo.RetrieveMetadata(metadataKey)
 	if err == nil {
@@ -73,7 +72,7 @@ func (s *ThoughtService) RetrieveThought(thoughtKey, passphrase string) (entity.
 		return entity.ThoughtResponse{}, err
 	}
 
-	if len(hashedPassphrase) != 0 && CheckPasswordHashes(passphrase, hashedPassphrase) == false {
+	if len(hashedPassphrase) != 0 && crypt.CheckPasswordHashes(passphrase, hashedPassphrase) == false {
 		return entity.ThoughtResponse{}, errors.New("password does not match")
 	}
 
@@ -116,19 +115,9 @@ func (s *ThoughtService) BurnThought(metadataKey, passphrase string) (bool, erro
 		return false, err
 	}
 
-	if len(hashedPassphrase) != 0 && CheckPasswordHashes(passphrase, hashedPassphrase) == false {
+	if len(hashedPassphrase) != 0 && crypt.CheckPasswordHashes(passphrase, hashedPassphrase) == false {
 		return false, errors.New("password does not match")
 	}
 
 	return s.repo.BurnThought(metadataKey, hashedPassphrase)
-}
-
-func HashPassphrase(passphrase string) (string, error) {
-	bytes, err := bcrypt.GenerateFromPassword([]byte(passphrase), 14)
-	return string(bytes), err
-}
-
-func CheckPasswordHashes(password, hash string) bool {
-	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
-	return err == nil
 }
