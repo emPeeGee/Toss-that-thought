@@ -1,22 +1,32 @@
-package service
+package thought
 
 import (
 	"errors"
 	"github.com/emPeeee/ttt/pkg/crypt"
 	"github.com/emPeeee/ttt/pkg/entity"
-	"github.com/emPeeee/ttt/pkg/repository"
+	"github.com/emPeeee/ttt/pkg/log"
 	"time"
 )
 
-type ThoughtService struct {
-	repo repository.Thought
+type Service interface {
+	Create(input entity.ThoughtCreateInput) (entity.ThoughtCreateResponse, error)
+	RetrieveMetadata(metadataKey string) (entity.ThoughtMetadataResponse, error)
+	RetrieveThought(thoughtKey, passphrase string) (entity.ThoughtResponse, error)
+	IsThoughtValid(thoughtKey string) (bool, error)
+	CheckMetadataExists(metadataKey string) (bool, error)
+	BurnThought(metadataKey, passphrase string) (bool, error)
 }
 
-func NewThoughtService(repo repository.Thought) *ThoughtService {
-	return &ThoughtService{repo: repo}
+type service struct {
+	repo   Repository
+	logger log.Logger
 }
 
-func (s *ThoughtService) Create(input entity.ThoughtCreateInput) (entity.ThoughtCreateResponse, error) {
+func NewThoughtService(repo Repository, logger log.Logger) *service {
+	return &service{repo: repo, logger: logger}
+}
+
+func (s *service) Create(input entity.ThoughtCreateInput) (entity.ThoughtCreateResponse, error) {
 	if len(input.Passphrase) != 0 {
 		hashedPassphrase, err := crypt.HashPassphrase(input.Passphrase)
 		if err != nil {
@@ -33,7 +43,7 @@ func (s *ThoughtService) Create(input entity.ThoughtCreateInput) (entity.Thought
 	return createdThought, err
 }
 
-func (s *ThoughtService) RetrieveMetadata(metadataKey string) (entity.ThoughtMetadataResponse, error) {
+func (s *service) RetrieveMetadata(metadataKey string) (entity.ThoughtMetadataResponse, error) {
 	metadata, err := s.repo.RetrieveMetadata(metadataKey)
 	if err == nil {
 		metadata.AbbreviatedThoughtKey = metadata.AbbreviatedThoughtKey[:6]
@@ -46,7 +56,7 @@ func (s *ThoughtService) RetrieveMetadata(metadataKey string) (entity.ThoughtMet
 	return metadata, err
 }
 
-func (s *ThoughtService) IsThoughtValid(thoughtKey string) (bool, error) {
+func (s *service) IsThoughtValid(thoughtKey string) (bool, error) {
 	thoughtValidityInfo, err := s.repo.RetrieveThoughtValidity(thoughtKey)
 	if err != nil {
 		return false, err
@@ -62,11 +72,11 @@ func (s *ThoughtService) IsThoughtValid(thoughtKey string) (bool, error) {
 	return true, nil
 }
 
-func (s *ThoughtService) CheckMetadataExists(metadataKey string) (bool, error) {
+func (s *service) CheckMetadataExists(metadataKey string) (bool, error) {
 	return s.repo.CheckMetadataExists(metadataKey)
 }
 
-func (s *ThoughtService) RetrieveThought(thoughtKey, passphrase string) (entity.ThoughtResponse, error) {
+func (s *service) RetrieveThought(thoughtKey, passphrase string) (entity.ThoughtResponse, error) {
 	hashedPassphrase, err := s.repo.GetPassphraseOfThoughtByThoughtKey(thoughtKey)
 	if err != nil {
 		return entity.ThoughtResponse{}, err
@@ -88,7 +98,7 @@ func (s *ThoughtService) RetrieveThought(thoughtKey, passphrase string) (entity.
 	return thoughtResponse, nil
 }
 
-func (s *ThoughtService) BurnThought(metadataKey, passphrase string) (bool, error) {
+func (s *service) BurnThought(metadataKey, passphrase string) (bool, error) {
 	thoughtMetadata, err := s.repo.RetrieveMetadata(metadataKey)
 	if err != nil {
 		return false, err

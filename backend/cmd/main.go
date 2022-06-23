@@ -2,16 +2,20 @@ package main
 
 import (
 	"context"
+	"github.com/emPeeee/ttt/internal/thought"
 	"github.com/emPeeee/ttt/pkg/log"
+	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
+	"github.com/jmoiron/sqlx"
+	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"github.com/emPeeee/ttt"
-	"github.com/emPeeee/ttt/pkg/handler"
 	"github.com/emPeeee/ttt/pkg/repository"
-	"github.com/emPeeee/ttt/pkg/service"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 	"github.com/spf13/viper"
@@ -19,6 +23,15 @@ import (
 
 var Version = "1.0.0"
 
+// Here is what from max and that friend
+// Max, graceful shutdown, configs,
+// Friend, handler, service, repo, logger
+
+// To continue implementing new arhitecture,
+// DB init to be removed from repository
+// Entity as well ???
+// configure logger as in example
+// ...
 func main() {
 	logger := log.New().With(nil, "version", Version)
 
@@ -45,13 +58,8 @@ func main() {
 
 	server := new(ttt.Server)
 
-	v := validator.New()
-	repositories := repository.NewRepository(db)
-	services := service.NewService(repositories)
-	handlers := handler.NewHandler(services, v)
-
 	go func() {
-		if err := server.Run(viper.GetString("port"), handlers.InitializeRoutes()); err != nil {
+		if err := server.Run(viper.GetString("port"), buildHandler(db, logger)); err != nil {
 			logger.Fatalf("Error occurred while running http server: %s", err.Error())
 		}
 	}()
@@ -78,4 +86,25 @@ func initializeConfig() error {
 	viper.SetConfigName("config")
 
 	return viper.ReadInConfig()
+}
+
+// buildHandler sets up the HTTP routing and builds an HTTP handler.
+func buildHandler(db *sqlx.DB, logger log.Logger) http.Handler {
+	router := gin.New()
+	router.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"http://localhost:3000"},
+		AllowMethods:     []string{"GET", "POST", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Type"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+		MaxAge:           12 * time.Hour,
+	}))
+
+	router.Use(gin.Logger())
+
+	valid := validator.New()
+	thought.RegisterHandlers(router.Group("/api"), thought.NewThoughtService(thought.NewRepository(db, logger), logger), valid, logger)
+
+	return router
+
 }
