@@ -2,7 +2,7 @@ package thought
 
 import (
 	"errors"
-	"github.com/emPeeee/ttt/pkg/entity"
+	"github.com/emPeeee/ttt/internal/entity"
 	"github.com/emPeeee/ttt/pkg/log"
 	"github.com/jmoiron/sqlx"
 )

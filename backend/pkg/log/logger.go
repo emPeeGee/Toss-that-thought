@@ -7,6 +7,7 @@ import (
 	"go.uber.org/zap/zapcore"
 	"go.uber.org/zap/zaptest/observer"
 	"net/http"
+	"time"
 )
 
 type Logger interface {
@@ -46,6 +47,10 @@ const (
 func New() Logger {
 	config := zap.NewDevelopmentConfig()
 	config.EncoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
+	config.EncoderConfig.TimeKey = "timestamp"
+	config.EncoderConfig.EncodeTime = zapcore.TimeEncoderOfLayout(time.Stamp)
+	config.EncoderConfig.ConsoleSeparator = " | "
+	config.DisableStacktrace = true
 
 	l, _ := config.Build()
 	return NewWithZap(l)

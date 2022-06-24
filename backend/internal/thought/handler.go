@@ -1,22 +1,13 @@
 package thought
 
 import (
+	"github.com/emPeeee/ttt/internal/entity"
 	"github.com/emPeeee/ttt/internal/flaw"
-	"github.com/emPeeee/ttt/pkg/entity"
 	"github.com/emPeeee/ttt/pkg/log"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	"net/http"
 )
-
-type Thought interface {
-	Create(input entity.ThoughtCreateInput) (entity.ThoughtCreateResponse, error)
-	RetrieveMetadata(metadataKey string) (entity.ThoughtMetadataResponse, error)
-	RetrieveThought(thoughtKey, passphrase string) (entity.ThoughtResponse, error)
-	IsThoughtValid(thoughtKey string) (bool, error)
-	CheckMetadataExists(metadataKey string) (bool, error)
-	BurnThought(metadataKey, passphrase string) (bool, error)
-}
 
 func RegisterHandlers(r *gin.RouterGroup, service Service, validate *validator.Validate, logger log.Logger) {
 	h := handler{service, logger, validate}

@@ -1,4 +1,4 @@
-package ttt
+package connection
 
 import (
 	"context"

@@ -2,23 +2,22 @@ package main
 
 import (
 	"context"
+	"github.com/emPeeee/ttt/internal/connection"
+	"github.com/emPeeee/ttt/internal/cors"
+	"github.com/emPeeee/ttt/internal/flaw"
 	"github.com/emPeeee/ttt/internal/thought"
+	"github.com/emPeeee/ttt/pkg/accesslog"
 	"github.com/emPeeee/ttt/pkg/log"
-	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	"github.com/jmoiron/sqlx"
+	"github.com/joho/godotenv"
+	_ "github.com/lib/pq"
+	"github.com/spf13/viper"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
-	"time"
-
-	"github.com/emPeeee/ttt"
-	"github.com/emPeeee/ttt/pkg/repository"
-	"github.com/joho/godotenv"
-	_ "github.com/lib/pq"
-	"github.com/spf13/viper"
 )
 
 var Version = "1.0.0"
@@ -27,11 +26,6 @@ var Version = "1.0.0"
 // Max, graceful shutdown, configs,
 // Friend, handler, service, repo, logger
 
-// To continue implementing new arhitecture,
-// DB init to be removed from repository
-// Entity as well ???
-// configure logger as in example
-// ...
 func main() {
 	logger := log.New().With(nil, "version", Version)
 
@@ -43,7 +37,7 @@ func main() {
 		logger.Fatalf("Error loading env variables: %s", err.Error())
 	}
 
-	db, err := repository.NewPostgresDB(repository.Config{
+	db, err := connection.NewPostgresDB(connection.DBConfig{
 		Host:     viper.GetString("db.host"),
 		Port:     viper.GetString("db.port"),
 		Username: viper.GetString("db.username"),
@@ -56,10 +50,11 @@ func main() {
 		logger.Fatalf("failed to initialize db: %s", err.Error())
 	}
 
-	server := new(ttt.Server)
+	server := new(connection.Server)
+	valid := validator.New()
 
 	go func() {
-		if err := server.Run(viper.GetString("port"), buildHandler(db, logger)); err != nil {
+		if err := server.Run(viper.GetString("port"), buildHandler(db, valid, logger)); err != nil {
 			logger.Fatalf("Error occurred while running http server: %s", err.Error())
 		}
 	}()
@@ -89,22 +84,11 @@ func initializeConfig() error {
 }
 
 // buildHandler sets up the HTTP routing and builds an HTTP handler.
-func buildHandler(db *sqlx.DB, logger log.Logger) http.Handler {
+func buildHandler(db *sqlx.DB, valid *validator.Validate, logger log.Logger) http.Handler {
 	router := gin.New()
-	router.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"http://localhost:3000"},
-		AllowMethods:     []string{"GET", "POST", "OPTIONS"},
-		AllowHeaders:     []string{"Origin", "Content-Type"},
-		ExposeHeaders:    []string{"Content-Length"},
-		AllowCredentials: true,
-		MaxAge:           12 * time.Hour,
-	}))
+	router.Use(accesslog.Handler(logger), flaw.Handler(logger), cors.Handler())
 
-	router.Use(gin.Logger())
-
-	valid := validator.New()
 	thought.RegisterHandlers(router.Group("/api"), thought.NewThoughtService(thought.NewRepository(db, logger), logger), valid, logger)
 
 	return router
-
 }
