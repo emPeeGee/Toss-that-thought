@@ -13,22 +13,14 @@ import (
 type Logger interface {
 	With(ctx context.Context, args ...interface{}) Logger
 
-	// Debug uses fmt.Sprint to construct and log a message at DEBUG level
 	Debug(args ...interface{})
-	// Info uses fmt.Sprint to construct and log a message at INFO level
 	Info(args ...interface{})
-	// Error uses fmt.Sprint to construct and log a message at ERROR level
 	Error(args ...interface{})
-	// Fatal uses fmt.Sprint to construct and log a message at ERROR level
 	Fatal(args ...interface{})
 
-	// Debugf uses fmt.Sprintf to construct and log a message at DEBUG level
 	Debugf(format string, args ...interface{})
-	// Infof uses fmt.Sprintf to construct and log a message at INFO level
 	Infof(format string, args ...interface{})
-	// Errorf uses fmt.Sprintf to construct and log a message at ERROR level
 	Errorf(format string, args ...interface{})
-	// Fatalf uses fmt.Sprintf to construct and log a message at ERROR level
 	Fatalf(format string, args ...interface{})
 }
 
@@ -83,9 +75,11 @@ func (l *logger) With(ctx context.Context, args ...interface{}) Logger {
 			args = append(args, zap.String("correlation_id", id))
 		}
 	}
+
 	if len(args) > 0 {
 		return &logger{l.SugaredLogger.With(args...)}
 	}
+
 	return l
 }
 

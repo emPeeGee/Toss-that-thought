@@ -15,7 +15,7 @@ func Handler(logger log.Logger) gin.HandlerFunc {
 		// so that they can be added to the log messages
 		ctx := c.Request.Context()
 		ctx = log.WithRequest(ctx, c.Request)
-		//c.Request = c.Request.WithContext(ctx)
+		c.Request = c.Request.WithContext(ctx)
 
 		c.Next()
 
