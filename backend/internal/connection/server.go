@@ -2,21 +2,21 @@ package connection
 
 import (
 	"context"
+	"github.com/emPeeee/ttt/internal/config"
 	"net/http"
-	"time"
 )
 
 type Server struct {
 	httpServer *http.Server
 }
 
-func (s *Server) Run(port string, handler http.Handler) error {
+func (s *Server) Run(serverConf config.Server, handler http.Handler) error {
 	s.httpServer = &http.Server{
-		Addr:           ":" + port,
+		Addr:           serverConf.Addr,
+		MaxHeaderBytes: serverConf.MaxHeaderBytes,
+		ReadTimeout:    serverConf.ReadTimeout,
+		WriteTimeout:   serverConf.WriteTimeout,
 		Handler:        handler,
-		MaxHeaderBytes: 1 << 20, // 1 MB
-		ReadTimeout:    10 * time.Second,
-		WriteTimeout:   10 * time.Second,
 	}
 
 	return s.httpServer.ListenAndServe()

@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"github.com/emPeeee/ttt/internal/config"
 	"github.com/emPeeee/ttt/internal/connection"
 	"github.com/emPeeee/ttt/internal/cors"
 	"github.com/emPeeee/ttt/internal/flaw"
@@ -11,40 +12,29 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	"github.com/jmoiron/sqlx"
-	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
-	"github.com/spf13/viper"
+	"net"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 )
 
-var Version = "1.0.0"
+const Version = "1.0.0"
 
 // Here is what from max and that friend
 // Max, graceful shutdown, configs,
 // Friend, handler, service, repo, logger
+// My, connection, crypt
 
 func main() {
 	logger := log.New().With(nil, "version", Version)
-
-	if err := initializeConfig(); err != nil {
-		logger.Fatalf("Error initializing configs: %s", err.Error())
+	config, err := config.Get(logger)
+	if err != nil {
+		logger.Fatalf("failed to initialize config: %s", err.Error())
 	}
 
-	if err := godotenv.Load(); err != nil {
-		logger.Fatalf("Error loading env variables: %s", err.Error())
-	}
-
-	db, err := connection.NewPostgresDB(connection.DBConfig{
-		Host:     viper.GetString("db.host"),
-		Port:     viper.GetString("db.port"),
-		Username: viper.GetString("db.username"),
-		DBName:   viper.GetString("db.dbname"),
-		SSLMode:  viper.GetString("db.sslmode"),
-		Password: os.Getenv("DB_PASSWORD"),
-	})
+	db, err := connection.NewPostgresDB(config.DB)
 
 	if err != nil {
 		logger.Fatalf("failed to initialize db: %s", err.Error())
@@ -54,12 +44,14 @@ func main() {
 	valid := validator.New()
 
 	go func() {
-		if err := server.Run(viper.GetString("port"), buildHandler(db, valid, logger)); err != nil {
+		if err := server.Run(config.Server, buildHandler(db, valid, logger)); err != nil {
 			logger.Fatalf("Error occurred while running http server: %s", err.Error())
 		}
 	}()
 
 	logger.Info("TTt Started")
+	port, err := net.LookupPort("tcp", "http")
+	logger.Info(port)
 
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGTERM, syscall.SIGINT)
@@ -74,13 +66,6 @@ func main() {
 	if err := db.Close(); err != nil {
 		logger.Fatalf("error occurred on db connection close: %s", err.Error())
 	}
-}
-
-func initializeConfig() error {
-	viper.AddConfigPath("configs")
-	viper.SetConfigName("config")
-
-	return viper.ReadInConfig()
 }
 
 // buildHandler sets up the HTTP routing and builds an HTTP handler.
