@@ -5,13 +5,13 @@ import (
 	"github.com/emPeeee/ttt/internal/config"
 	"github.com/emPeeee/ttt/internal/connection"
 	"github.com/emPeeee/ttt/internal/cors"
+	"github.com/emPeeee/ttt/internal/entity"
 	"github.com/emPeeee/ttt/internal/flaw"
 	"github.com/emPeeee/ttt/internal/thought"
 	"github.com/emPeeee/ttt/pkg/accesslog"
 	"github.com/emPeeee/ttt/pkg/log"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
-	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 	"gorm.io/gorm"
 	"net/http"
@@ -45,16 +45,16 @@ func main() {
 		logger.Fatalf("failed to initialize db: %s", err.Error())
 	}
 
-	gormDB, err := connection.NewPostgresDB2(cfg.DB)
+	err = db.AutoMigrate(&entity.Thought{})
 	if err != nil {
-		logger.Fatalf("failed to initialize db: %s", err.Error())
+		logger.Fatalf("failed to auto migrate gorm", err.Error())
 	}
 
 	server := new(connection.Server)
 	valid := validator.New()
 
 	go func() {
-		if err := server.Run(cfg.Server, buildHandler(db, gormDB, valid, logger)); err != nil {
+		if err := server.Run(cfg.Server, buildHandler(db, valid, logger)); err != nil {
 			logger.Fatalf("Error occurred while running http server: %s", err.Error())
 		}
 	}()
@@ -70,20 +70,16 @@ func main() {
 	if err := server.Shutdown(context.Background()); err != nil {
 		logger.Fatalf("error occurred on server shutting down: %s", err.Error())
 	}
-
-	if err := db.Close(); err != nil {
-		logger.Fatalf("error occurred on db connection close: %s", err.Error())
-	}
 }
 
 // buildHandler sets up the HTTP routing and builds an HTTP handler.
-func buildHandler(db *sqlx.DB, gorm *gorm.DB, valid *validator.Validate, logger log.Logger) http.Handler {
+func buildHandler(db *gorm.DB, valid *validator.Validate, logger log.Logger) http.Handler {
 	router := gin.New()
 	router.Use(accesslog.Handler(logger), flaw.Handler(logger), cors.Handler())
 
 	thought.RegisterHandlers(
 		router.Group("/api"),
-		thought.NewThoughtService(thought.NewRepository(db, gorm, logger), logger),
+		thought.NewThoughtService(thought.NewRepository(db, logger), logger),
 		valid,
 		logger,
 	)

@@ -19,13 +19,8 @@ type ThoughtCreateResponse struct {
 	Lifetime              time.Time `json:"lifetime" db:"lifetime" validate:"required"`
 }
 
-// These two are similar
 type ThoughtPassphraseInput struct {
 	Passphrase string `json:"passphrase" validate:"required,max=255"`
-}
-
-type UserPassphrase struct {
-	Passphrase string
 }
 
 type ThoughtResponse struct {
