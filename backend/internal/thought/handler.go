@@ -41,13 +41,13 @@ func (h *handler) create(c *gin.Context) {
 		return
 	}
 
-	thoughtMetadata, err := h.service.Create(input)
+	createdThought, err := h.service.Create(input)
 	if err != nil {
 		flaw.InternalServer(c, "something went wrong, we are working", err.Error())
 		return
 	}
 
-	c.JSON(http.StatusOK, thoughtMetadata)
+	c.JSON(http.StatusOK, createdThought)
 }
 
 func (h *handler) retrieveMetadata(c *gin.Context) {

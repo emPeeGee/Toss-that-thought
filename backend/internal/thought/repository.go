@@ -133,9 +133,11 @@ func (r *repository) MarkAsViewed(thoughtKey, passphrase string) error {
 	//	return errors.New("server error")
 	//}
 
+	now := time.Now()
+
 	result := r.gorm.Model(&entity.Thought{}).Where("passphrase = ? AND thought_key = ?", passphrase, thoughtKey).Updates(entity.Thought{
 		IsViewed:   true,
-		ViewedDate: time.Now(),
+		ViewedDate: &now,
 	})
 
 	if result.Error != nil && result.RowsAffected <= 0 {
@@ -155,9 +157,11 @@ func (r *repository) BurnThought(metadataKey, passphrase string) (bool, error) {
 	//
 	//nr, _ := res.RowsAffected()
 
+	now := time.Now()
+
 	result := r.gorm.Model(&entity.Thought{}).Where("passphrase = ? AND metadata_key = ?", passphrase, metadataKey).Updates(&entity.Thought{
 		IsBurned:   true,
-		BurnedDate: time.Now(),
+		BurnedDate: &now,
 	})
 
 	if result.Error != nil && result.RowsAffected <= 0 {

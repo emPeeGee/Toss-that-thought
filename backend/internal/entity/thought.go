@@ -2,7 +2,6 @@ package entity
 
 import (
 	"github.com/google/uuid"
-	"github.com/lib/pq"
 	"time"
 )
 
@@ -41,25 +40,25 @@ type ThoughtValidityInformation struct {
 }
 
 type ThoughtMetadataResponse struct {
-	Lifetime              time.Time   `json:"lifetime" db:"lifetime"`
-	AbbreviatedThoughtKey string      `json:"abbreviatedThoughtKey" db:"abbreviated_thought_key" gorm:"column:thought_key"`
-	IsBurned              bool        `json:"isBurned" db:"is_burned"`
-	BurnedDate            pq.NullTime `json:"burnedDate" db:"burned_date"`
-	IsViewed              bool        `json:"isViewed" db:"is_viewed"`
-	ViewedDate            pq.NullTime `json:"viewedDate" db:"viewed_date"`
-	CreatedDate           time.Time   `json:"createdDate" db:"created_date"`
+	Lifetime              time.Time  `json:"lifetime" db:"lifetime"`
+	AbbreviatedThoughtKey string     `json:"abbreviatedThoughtKey" db:"abbreviated_thought_key" gorm:"column:thought_key"`
+	IsBurned              bool       `json:"isBurned" db:"is_burned"`
+	BurnedDate            *time.Time `json:"burnedDate" db:"burned_date"`
+	IsViewed              bool       `json:"isViewed" db:"is_viewed"`
+	ViewedDate            *time.Time `json:"viewedDate" db:"viewed_date"`
+	CreatedDate           time.Time  `json:"createdDate" db:"created_date"`
 }
 
 type Thought struct {
-	Id          int       `json:"id" db:"id"`
-	Thought     string    `json:"thought" db:"thought" validate:"required" gorm:"notNull"`
-	Passphrase  string    `json:"passphrase" db:"passphrase" validate:"required" gorm:"notNull;size:255"`
-	Lifetime    time.Time `json:"lifetime" db:"lifetime" validate:"required" gorm:"notNull"`
-	IsBurned    bool      `json:"isBurned" db:"is_burned" gorm:"default:false"`
-	IsViewed    bool      `json:"isViewed" db:"is_viewed" gorm:"default:false"`
-	BurnedDate  time.Time `json:"burnedDate" db:"burned_date"`
-	ViewedDate  time.Time `json:"viewedDate" db:"viewed_date"`
-	CreatedDate time.Time `json:"createdDate" db:"created_date" gorm:"autoCreateTime"`
-	MetadataKey uuid.UUID `json:"metadataKey" db:"metadata_key" gorm:"type:uuid;default:uuid_generate_v4()"`
-	ThoughtKey  uuid.UUID `json:"thoughtKey" db:"thought_key" gorm:"type:uuid;default:uuid_generate_v4()"`
+	Id          int        `json:"id" db:"id"`
+	Thought     string     `json:"thought" db:"thought" validate:"required" gorm:"notNull"`
+	Passphrase  string     `json:"passphrase" db:"passphrase" validate:"required" gorm:"notNull;size:255"`
+	Lifetime    time.Time  `json:"lifetime" db:"lifetime" validate:"required" gorm:"notNull"`
+	IsBurned    bool       `json:"isBurned" db:"is_burned" gorm:"default:false;notNull"`
+	IsViewed    bool       `json:"isViewed" db:"is_viewed" gorm:"default:false;notNull"`
+	BurnedDate  *time.Time `json:"burnedDate" db:"burned_date"`
+	ViewedDate  *time.Time `json:"viewedDate" db:"viewed_date"`
+	CreatedDate time.Time  `json:"createdDate" db:"created_date" gorm:"autoCreateTime;notNull"`
+	MetadataKey uuid.UUID  `json:"metadataKey" db:"metadata_key" gorm:"notNull;type:uuid;default:uuid_generate_v4()"`
+	ThoughtKey  uuid.UUID  `json:"thoughtKey" db:"thought_key" gorm:"notNull;type:uuid;default:uuid_generate_v4()"`
 }
