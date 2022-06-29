@@ -37,7 +37,7 @@ func (s *service) Create(input entity.ThoughtCreateInput) (entity.ThoughtCreateR
 
 	createdThought, err := s.repo.Create(input)
 	if err == nil {
-		createdThought.AbbreviatedThoughtKey = createdThought.ThoughtKey[:6]
+		createdThought.AbbreviatedThoughtKey = createdThought.ThoughtKey.String()[:6]
 	}
 
 	return createdThought, err

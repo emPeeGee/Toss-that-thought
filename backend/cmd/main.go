@@ -13,7 +13,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
-	"net"
+	"gorm.io/gorm"
 	"net/http"
 	"os"
 	"os/signal"
@@ -27,15 +27,25 @@ const Version = "1.0.0"
 // Friend, handler, service, repo, logger
 // My, connection, crypt
 
+// RUN: Before autoMigrate -> CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 func main() {
 	logger := log.New().With(nil, "version", Version)
-	config, err := config.Get(logger)
+
+	if err := os.Setenv("TZ", "Universal"); err != nil {
+		logger.Fatalf("Error setting environment variable")
+	}
+
+	cfg, err := config.Get(logger)
 	if err != nil {
 		logger.Fatalf("failed to initialize config: %s", err.Error())
 	}
 
-	db, err := connection.NewPostgresDB(config.DB)
+	db, err := connection.NewPostgresDB(cfg.DB)
+	if err != nil {
+		logger.Fatalf("failed to initialize db: %s", err.Error())
+	}
 
+	gormDB, err := connection.NewPostgresDB2(cfg.DB)
 	if err != nil {
 		logger.Fatalf("failed to initialize db: %s", err.Error())
 	}
@@ -44,14 +54,12 @@ func main() {
 	valid := validator.New()
 
 	go func() {
-		if err := server.Run(config.Server, buildHandler(db, valid, logger)); err != nil {
+		if err := server.Run(cfg.Server, buildHandler(db, gormDB, valid, logger)); err != nil {
 			logger.Fatalf("Error occurred while running http server: %s", err.Error())
 		}
 	}()
 
 	logger.Info("TTt Started")
-	port, err := net.LookupPort("tcp", "http")
-	logger.Info(port)
 
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGTERM, syscall.SIGINT)
@@ -69,11 +77,16 @@ func main() {
 }
 
 // buildHandler sets up the HTTP routing and builds an HTTP handler.
-func buildHandler(db *sqlx.DB, valid *validator.Validate, logger log.Logger) http.Handler {
+func buildHandler(db *sqlx.DB, gorm *gorm.DB, valid *validator.Validate, logger log.Logger) http.Handler {
 	router := gin.New()
 	router.Use(accesslog.Handler(logger), flaw.Handler(logger), cors.Handler())
 
-	thought.RegisterHandlers(router.Group("/api"), thought.NewThoughtService(thought.NewRepository(db, logger), logger), valid, logger)
+	thought.RegisterHandlers(
+		router.Group("/api"),
+		thought.NewThoughtService(thought.NewRepository(db, gorm, logger), logger),
+		valid,
+		logger,
+	)
 
 	return router
 }
