@@ -76,8 +76,8 @@ export function ThoughtBurn() {
     return (
       <Container size="md" my="xl">
         <Alert my="md" color="orange" title="Cannot burn!">
-          The thought was already viewed {prettyDiffDate(thoughtMetadata.viewedDate?.Time)}.
-          {new Date(thoughtMetadata?.viewedDate?.Time ?? '').toLocaleString()}
+          The thought was already viewed {prettyDiffDate(thoughtMetadata.viewedDate)}.
+          {new Date(thoughtMetadata?.viewedDate ?? '').toLocaleString()}
         </Alert>
         <Button<typeof Link>
           fullWidth
@@ -95,8 +95,8 @@ export function ThoughtBurn() {
     return (
       <Container size="md" my="xl">
         <Alert my="md" color="orange" title="Cannot burn!">
-          The thought was already burned {prettyDiffDate(thoughtMetadata.burnedDate?.Time)}.{' '}
-          {new Date(thoughtMetadata?.burnedDate?.Time ?? '').toLocaleString()}
+          The thought was already burned {prettyDiffDate(thoughtMetadata.burnedDate)}.{' '}
+          {new Date(thoughtMetadata?.burnedDate ?? '').toLocaleString()}
         </Alert>
         <Button<typeof Link>
           fullWidth

@@ -1,17 +1,11 @@
-// TODO: Here something is not correct, replace NullTime on back
-interface NullTime {
-  Time: string;
-  Valid: boolean;
-}
-
 export interface ThoughtMetadataModel {
   thoughtKey?: string;
   metadataKey: string;
   lifetime: string;
   passphrase?: string;
   abbreviatedThoughtKey?: string;
-  burnedDate?: NullTime;
-  viewedDate?: NullTime;
+  burnedDate?: string;
+  viewedDate?: string;
   isBurned: boolean;
   isViewed: boolean;
 }

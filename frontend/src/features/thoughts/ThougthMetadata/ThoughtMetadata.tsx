@@ -90,16 +90,16 @@ export function ThoughtMetadata() {
       {thoughtMetadata?.isViewed ? (
         <Grid align="center" mx={0} my="lg">
           <Text size="xl" weight="500">
-            Viewed {getDateDiffIn(DateUnit.minute, thoughtMetadata?.viewedDate?.Time)} minutes ago.
+            Viewed {getDateDiffIn(DateUnit.minute, thoughtMetadata?.viewedDate)} minutes ago.
           </Text>
           <Text color="dimmed" pl="sm">
-            {thoughtMetadata?.viewedDate?.Time}
+            {thoughtMetadata?.viewedDate}
           </Text>
         </Grid>
       ) : thoughtMetadata?.isBurned ? (
         <Code color="blue" style={{ fontSize: '20px' }}>
-          Burned {prettyDiffDate(thoughtMetadata.burnedDate?.Time)}.{' '}
-          {new Date(thoughtMetadata?.burnedDate?.Time ?? '').toLocaleString()}
+          Burned {prettyDiffDate(thoughtMetadata.burnedDate)}.{' '}
+          {new Date(thoughtMetadata?.burnedDate ?? '').toLocaleString()}
         </Code>
       ) : (
         <>
