@@ -8,6 +8,7 @@ import { Footer } from 'components/layout/Footer/Footer';
 import { AppShell } from 'components/layout/AppShell/AppShell';
 import { ThoughtMetadata, ThoughtCreate, ThoughtBurn, ThoughtView } from 'features/thoughts';
 import { NotFound } from 'components/layout/NotFound/NotFound';
+import { NotificationsProvider } from '@mantine/notifications';
 
 function App() {
   const [colorScheme, setColorScheme] = useState<ColorScheme>('light');
@@ -52,21 +53,23 @@ function App() {
           colorScheme,
           fontFamily: 'Open Sans, sans serif'
         }}>
-        <BrowserRouter>
-          <GlobalStyles />
-          <AppShell>
-            <Header />
-            <Routes>
-              <Route path="/" element={<ThoughtCreate />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/metadata/:metadataKey" element={<ThoughtMetadata />} />
-              <Route path="/thought/:thoughtKey" element={<ThoughtView />} />
-              <Route path="/thought/:metadataKey/burn" element={<ThoughtBurn />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-            <Footer />
-          </AppShell>
-        </BrowserRouter>
+        <NotificationsProvider>
+          <BrowserRouter>
+            <GlobalStyles />
+            <AppShell>
+              <Header />
+              <Routes>
+                <Route path="/" element={<ThoughtCreate />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/metadata/:metadataKey" element={<ThoughtMetadata />} />
+                <Route path="/thought/:thoughtKey" element={<ThoughtView />} />
+                <Route path="/thought/:metadataKey/burn" element={<ThoughtBurn />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+              <Footer />
+            </AppShell>
+          </BrowserRouter>
+        </NotificationsProvider>
       </MantineProvider>
     </ColorSchemeProvider>
   );

@@ -1,6 +1,7 @@
 /* eslint-disable no-nested-ternary */
 import React, { useEffect, useState } from 'react';
 import {
+  ActionIcon,
   Alert,
   Button,
   Code,
@@ -18,12 +19,16 @@ import { isObjectEmpty } from 'utils/is-empty';
 import { ThoughtMetadataModel } from 'features/thoughts/thought.model';
 import { DateUnit, getDateDiffIn, prettyDiffDate } from 'utils/date';
 import { api } from 'services/http';
+import { copyTextToClipboard } from 'utils/copy-to-clipboard';
+import { showNotification } from '@mantine/notifications';
+import { selectElement } from 'utils/select-element';
 
 export function ThoughtMetadata() {
   const { state: routerState } = useLocation();
   const { metadataKey } = useParams();
   const [isAdviceAlertVisible, setIsAdviceAlertVisible] = useState(true);
   const [thoughtMetadata, setThoughtMetadata] = useState<ThoughtMetadataModel>();
+  const [thoughtLink, setThoughtLink] = useState<string | undefined>(undefined);
   const [isError, setIsError] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -43,9 +48,30 @@ export function ThoughtMetadata() {
         });
     } else {
       setThoughtMetadata({ ...(routerState as ThoughtMetadataModel) });
+      setThoughtLink(
+        `http://localhost:3000/thought/${(routerState as ThoughtMetadataModel)?.thoughtKey}`
+      );
       window.history.replaceState({}, document.title);
     }
   }, [metadataKey, routerState]);
+
+  const copyToClipboard = () => {
+    copyTextToClipboard(thoughtLink)
+      .then(() => {
+        showNotification({
+          title: 'You did great ✅',
+          message: 'The thought link was copied to clipboard',
+          color: 'green'
+        });
+      })
+      .catch(() => {
+        showNotification({
+          title: 'Something went wrong. ❌',
+          message: 'The thought link was not copied to clipboard.',
+          color: 'red'
+        });
+      });
+  };
 
   if (isError) {
     return (
@@ -69,13 +95,33 @@ export function ThoughtMetadata() {
           <Text size="xl" weight="500">
             Share the link:
           </Text>
-          <Code color="yellow" my="xs" style={{ fontSize: '20px' }}>
-            http://localhost:3000/thought/
-            {thoughtMetadata?.thoughtKey}
-          </Code>
+          <Grid justify="space-between" align="center">
+            <Grid.Col span={11}>
+              <Code
+                color="yellow"
+                my="xs"
+                style={{ fontSize: '20px', cursor: 'copy' }}
+                onClick={(e) => selectElement(e.target as HTMLElement)}>
+                {thoughtLink}
+              </Code>
+            </Grid.Col>
+            <Grid.Col span={1}>
+              <ActionIcon
+                aria-label="Copy thought link to clipboard"
+                variant="outline"
+                onClick={() => copyToClipboard()}
+                size="lg"
+                style={{ marginLeft: 'auto' }}>
+                💾
+              </ActionIcon>
+            </Grid.Col>
+          </Grid>
           <Text color="gray" size="sm">
             Requires a passphrase.
           </Text>
+          <Alert color="orange" title="Warning" my="sm">
+            It will disappear forever after you leave the page
+          </Alert>
         </Paper>
       )}
       <Paper shadow="xs" p="md" my="md" withBorder>
