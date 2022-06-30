@@ -53,8 +53,8 @@ func (h *handler) create(c *gin.Context) {
 func (h *handler) retrieveMetadata(c *gin.Context) {
 	metadataKey := c.Param("id")
 
-	exists, err := h.service.CheckMetadataExists(metadataKey)
-	if err != nil || !exists {
+	err := h.service.CheckMetadataExists(metadataKey)
+	if err != nil {
 		flaw.NotFound(c, "such thought does not exists", err.Error())
 		return
 	}
@@ -71,22 +71,22 @@ func (h *handler) retrieveMetadata(c *gin.Context) {
 func (h *handler) thoughtValidity(c *gin.Context) {
 	thoughtKey := c.Param("id")
 
-	isValid, err := h.service.IsThoughtValid(thoughtKey)
-	if err != nil || !isValid {
+	err := h.service.IsThoughtValid(thoughtKey)
+	if err != nil {
 		flaw.NotFound(c, "thought it either never existed or already has been viewed", err.Error())
 		return
 	}
 
 	c.JSON(http.StatusOK, map[string]interface{}{
-		"ok": isValid,
+		"ok": true,
 	})
 }
 
 func (h *handler) retrieveThought(c *gin.Context) {
 	thoughtKey := c.Param("id")
 
-	isValid, err := h.service.IsThoughtValid(thoughtKey)
-	if err != nil || !isValid {
+	err := h.service.IsThoughtValid(thoughtKey)
+	if err != nil {
 		flaw.NotFound(c, "thought it either never existed or already has been viewed", err.Error())
 		return
 	}
@@ -110,8 +110,8 @@ func (h *handler) retrieveThought(c *gin.Context) {
 func (h *handler) burnThought(c *gin.Context) {
 	metadataKey := c.Param("id")
 
-	exists, err := h.service.CheckMetadataExists(metadataKey)
-	if err != nil || !exists {
+	err := h.service.CheckMetadataExists(metadataKey)
+	if err != nil {
 		flaw.NotFound(c, "such thought does not exists", err.Error())
 		return
 	}
@@ -122,13 +122,13 @@ func (h *handler) burnThought(c *gin.Context) {
 		return
 	}
 
-	ok, err := h.service.BurnThought(metadataKey, accessThoughtInput.Passphrase)
-	if err != nil || !ok {
+	err = h.service.BurnThought(metadataKey, accessThoughtInput.Passphrase)
+	if err != nil {
 		flaw.BadRequest(c, "passphrase is incorrect", err.Error())
 		return
 	}
 
 	c.JSON(http.StatusOK, map[string]interface{}{
-		"ok": ok,
+		"ok": true,
 	})
 }

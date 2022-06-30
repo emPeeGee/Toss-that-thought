@@ -12,9 +12,9 @@ type Service interface {
 	Create(input entity.ThoughtCreateInput) (entity.ThoughtCreateResponse, error)
 	RetrieveMetadata(metadataKey string) (entity.ThoughtMetadataResponse, error)
 	RetrieveThought(thoughtKey, passphrase string) (entity.ThoughtResponse, error)
-	IsThoughtValid(thoughtKey string) (bool, error)
-	CheckMetadataExists(metadataKey string) (bool, error)
-	BurnThought(metadataKey, passphrase string) (bool, error)
+	IsThoughtValid(thoughtKey string) error
+	CheckMetadataExists(metadataKey string) error
+	BurnThought(metadataKey, passphrase string) error
 }
 
 type service struct {
@@ -56,23 +56,23 @@ func (s *service) RetrieveMetadata(metadataKey string) (entity.ThoughtMetadataRe
 	return metadata, err
 }
 
-func (s *service) IsThoughtValid(thoughtKey string) (bool, error) {
+func (s *service) IsThoughtValid(thoughtKey string) error {
 	thoughtValidityInfo, err := s.repo.RetrieveThoughtValidity(thoughtKey)
 	if err != nil {
-		return false, err
+		return err
 	}
 
 	now := time.Now()
 
 	// if lifetime is passed, or is burned or is viewed return err
 	if now.After(thoughtValidityInfo.Lifetime) || thoughtValidityInfo.IsBurned || thoughtValidityInfo.IsViewed {
-		return false, errors.New("it either never existed or already has been viewed")
+		return errors.New("it either never existed or already has been viewed")
 	}
 
-	return true, nil
+	return nil
 }
 
-func (s *service) CheckMetadataExists(metadataKey string) (bool, error) {
+func (s *service) CheckMetadataExists(metadataKey string) error {
 	return s.repo.CheckMetadataExists(metadataKey)
 }
 
@@ -98,35 +98,35 @@ func (s *service) RetrieveThought(thoughtKey, passphrase string) (entity.Thought
 	return thoughtResponse, nil
 }
 
-func (s *service) BurnThought(metadataKey, passphrase string) (bool, error) {
+func (s *service) BurnThought(metadataKey, passphrase string) error {
 	thoughtMetadata, err := s.repo.RetrieveMetadata(metadataKey)
 	if err != nil {
-		return false, err
+		return err
 	}
 
 	if time.Now().After(thoughtMetadata.Lifetime) {
-		return false, errors.New("it either never existed or already has been viewed")
+		return errors.New("it either never existed or already has been viewed")
 	}
 
 	if thoughtMetadata.IsBurned {
-		return false, errors.New("thought is already burned")
+		return errors.New("thought is already burned")
 	}
 
 	if thoughtMetadata.IsViewed {
-		return false, errors.New("thought is already viewed")
+		return errors.New("thought is already viewed")
 	}
 
 	if time.Now().After(thoughtMetadata.Lifetime) {
-		return false, errors.New("cannot burn, lifetime passed")
+		return errors.New("cannot burn, lifetime passed")
 	}
 
 	hashedPassphrase, err := s.repo.GetPassphraseOfThoughtByMetadataKey(metadataKey)
 	if err != nil {
-		return false, err
+		return err
 	}
 
 	if len(hashedPassphrase) != 0 && crypt.CheckPasswordHashes(passphrase, hashedPassphrase) == false {
-		return false, errors.New("password does not match")
+		return errors.New("password does not match")
 	}
 
 	return s.repo.BurnThought(metadataKey, hashedPassphrase)

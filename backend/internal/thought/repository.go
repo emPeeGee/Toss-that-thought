@@ -1,6 +1,7 @@
 package thought
 
 import (
+	"errors"
 	"github.com/emPeeee/ttt/internal/entity"
 	"github.com/emPeeee/ttt/pkg/log"
 	"gorm.io/gorm"
@@ -12,8 +13,8 @@ type Repository interface {
 	RetrieveMetadata(metadataKey string) (entity.ThoughtMetadataResponse, error)
 	RetrieveThought(thoughtKey, passphrase string) (entity.ThoughtResponse, error)
 	RetrieveThoughtValidity(thoughtKey string) (entity.ThoughtValidityInformation, error)
-	CheckMetadataExists(metadataKey string) (bool, error)
-	BurnThought(metadataKey, passphrase string) (bool, error)
+	CheckMetadataExists(metadataKey string) error
+	BurnThought(metadataKey, passphrase string) error
 	MarkAsViewed(thoughtKey, passphrase string) error
 	GetPassphraseOfThoughtByMetadataKey(metadataKey string) (string, error)
 	GetPassphraseOfThoughtByThoughtKey(thoughtKey string) (string, error)
@@ -67,14 +68,19 @@ func (r *repository) RetrieveThoughtValidity(thoughtKey string) (entity.ThoughtV
 	return thoughtValidityInfo, nil
 }
 
-func (r *repository) CheckMetadataExists(metadataKey string) (bool, error) {
+func (r *repository) CheckMetadataExists(metadataKey string) error {
 	var exists bool
 
-	if err := r.db.Model(&entity.Thought{}).Select("count(*) > 0").Where("metadata_key = ?", metadataKey).Find(&exists).Error; err != nil || !exists {
-		return false, err
+	if err := r.db.Model(&entity.Thought{}).Select("count(*) > 0").Where("metadata_key = ?", metadataKey).Find(&exists).Error; err != nil {
+		return err
 	}
 
-	return true, nil
+	// TODO: Like that
+	if !exists {
+		return errors.New("such thought does not exist")
+	}
+
+	return nil
 }
 
 func (r *repository) RetrieveThought(thoughtKey, passphrase string) (entity.ThoughtResponse, error) {
@@ -102,7 +108,7 @@ func (r *repository) MarkAsViewed(thoughtKey, passphrase string) error {
 	return nil
 }
 
-func (r *repository) BurnThought(metadataKey, passphrase string) (bool, error) {
+func (r *repository) BurnThought(metadataKey, passphrase string) error {
 	now := time.Now()
 
 	result := r.db.Model(&entity.Thought{}).Where("passphrase = ? AND metadata_key = ?", passphrase, metadataKey).Updates(&entity.Thought{
@@ -111,10 +117,10 @@ func (r *repository) BurnThought(metadataKey, passphrase string) (bool, error) {
 	})
 
 	if result.Error != nil && result.RowsAffected <= 0 {
-		return false, result.Error
+		return result.Error
 	}
 
-	return true, nil
+	return nil
 }
 
 // to lower case this?
