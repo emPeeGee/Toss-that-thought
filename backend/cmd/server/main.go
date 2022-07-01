@@ -22,11 +22,6 @@ import (
 
 const Version = "1.0.0"
 
-// Here is what from max and that friend
-// Max, graceful shutdown, configs,
-// Friend, handler, service, repo, logger
-// My, connection, crypt
-
 // RUN: Before autoMigrate -> CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 func main() {
 	logger := log.New().With(nil, "version", Version)
