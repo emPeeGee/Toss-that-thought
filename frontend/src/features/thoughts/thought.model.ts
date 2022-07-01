@@ -23,3 +23,7 @@ export interface ThoughtPassphraseRequest {
 export interface ThoughtResponse {
   thought: string;
 }
+
+export interface ThoughtPassphraseInfo {
+  canPassphraseBeSkipped: boolean;
+}

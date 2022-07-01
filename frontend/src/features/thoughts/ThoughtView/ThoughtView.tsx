@@ -13,7 +13,7 @@ import { ArrowForwardUp, Eye, Lock } from 'tabler-icons-react';
 import { useForm } from 'react-hook-form';
 import { Link, useParams } from 'react-router-dom';
 import { api } from 'services/http';
-import { ThoughtPassphraseRequest, ThoughtResponse } from '../thought.model';
+import { ThoughtPassphraseInfo, ThoughtPassphraseRequest, ThoughtResponse } from '../thought.model';
 
 // TODO: A bug or a feature? When I burn a thought, but have a page with view thought,
 // if I enter password, it says that password is not correct, but on refresh,
@@ -29,11 +29,15 @@ export function ThoughtView() {
   const [isPassphraseCorrect, setIsPassphraseCorrect] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [thought, setThought] = useState('');
+  const [canSkipPassphrase, setCanSkipPapphrase] = React.useState(false);
 
   useEffect(() => {
     setIsLoading(true);
     api
-      .get({ url: `thought/${thoughtKey}` })
+      .get<ThoughtPassphraseInfo>({ url: `thought/${thoughtKey}` })
+      .then((response) => {
+        setCanSkipPapphrase(response.canPassphraseBeSkipped);
+      })
       .catch((err) => {
         console.log(err);
         setIsError(true);
@@ -100,14 +104,20 @@ export function ThoughtView() {
           )}
 
           <form onSubmit={handleSubmit(viewThought)}>
-            <Text size="xl">This thought requires a passphrase:</Text>
-            <PasswordInput
-              {...register('passphrase', { required: false, value: '' })}
-              my="md"
-              placeholder="Enter passphrase here"
-              toggleTabIndex={0}
-              icon={<Lock size={16} />}
-            />
+            {!canSkipPassphrase ? (
+              <>
+                <Text size="xl">This thought requires a passphrase:</Text>
+                <PasswordInput
+                  {...register('passphrase', { required: false, value: '' })}
+                  my="md"
+                  placeholder="Enter passphrase here"
+                  toggleTabIndex={0}
+                  icon={<Lock size={16} />}
+                />
+              </>
+            ) : (
+              <Text size="xl">Click the button to continue 👇</Text>
+            )}
             <Button fullWidth my="lg" variant="light" leftIcon={<Eye size={24} />} type="submit">
               View thought
             </Button>
