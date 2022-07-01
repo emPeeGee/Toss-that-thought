@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	"net/http"
+	"time"
 )
 
 func RegisterHandlers(r *gin.RouterGroup, service Service, validate *validator.Validate, logger log.Logger) {
@@ -38,6 +39,13 @@ func (h *handler) create(c *gin.Context) {
 
 	if err := h.validate.Struct(input); err != nil {
 		flaw.BadRequest(c, "your request did not pass validation", err.Error())
+		return
+	}
+
+	// TODO: Future, to make a validator for this https://github.com/go-playground/validator/issues/494
+	maxLifetime := time.Now().AddDate(0, 0, 7)
+	if input.Lifetime.After(maxLifetime) {
+		flaw.BadRequest(c, "lifetime cannot be so long", "lifetime cannot be more thatn 7 days")
 		return
 	}
 

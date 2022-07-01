@@ -13,13 +13,9 @@ func Handler(logger log.Logger) gin.HandlerFunc {
 
 		for _, err := range c.Errors {
 			l := logger.With(c.Request.Context())
-
 			errResponse := buildErrorResponse(err)
-			if errResponse.Status == http.StatusInternalServerError {
-				l.Errorf("encountered internal server error: %v", err.Error())
-			} else {
-				l.Errorf("Status %d, Message: %s. Details: %s", errResponse.Status, errResponse.Message, errResponse.Details)
-			}
+
+			l.Errorf("Status %d, Message: %s. Details: %s", errResponse.Status, errResponse.Message, errResponse.Details)
 
 			c.AbortWithStatusJSON(errResponse.Status, errResponse)
 		}

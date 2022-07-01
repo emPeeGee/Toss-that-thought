@@ -23,6 +23,16 @@ Content-Type: application/json
   "lifetime": "2006-01-02T15:04:05Z"
 }
 
+### Invalid Create request with lifetime bigger that 7 days
+POST http://localhost:9000/api/create
+Content-Type: application/json
+
+{
+  "thought": "Hey",
+  "passphrase": "",
+  "lifetime": "2022-07-09T07:27:46.673Z"
+}
+
 ### GET Metadata request
 GET http://localhost:9000/api/metadata/{{metadataKey}}
 
