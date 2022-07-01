@@ -1,7 +1,6 @@
 /* eslint-disable no-nested-ternary */
 import React, { useEffect, useState } from 'react';
 import {
-  ActionIcon,
   Alert,
   Button,
   Code,
@@ -17,11 +16,9 @@ import { Link, useLocation, useParams } from 'react-router-dom';
 import { Bolt, MessageCircle2 } from 'tabler-icons-react';
 import { isObjectEmpty } from 'utils/is-empty';
 import { ThoughtMetadataModel } from 'features/thoughts/thought.model';
+import * as Thought from 'features/thoughts';
 import { DateUnit, getDateDiffIn, prettyDiffDate } from 'utils/date';
 import { api } from 'services/http';
-import { copyTextToClipboard } from 'utils/copy-to-clipboard';
-import { showNotification } from '@mantine/notifications';
-import { selectElement } from 'utils/select-element';
 
 export function ThoughtMetadata() {
   const { state: routerState } = useLocation();
@@ -55,24 +52,6 @@ export function ThoughtMetadata() {
     }
   }, [metadataKey, routerState]);
 
-  const copyToClipboard = () => {
-    copyTextToClipboard(thoughtLink)
-      .then(() => {
-        showNotification({
-          title: 'You did great ✅',
-          message: 'The thought link was copied to clipboard',
-          color: 'green'
-        });
-      })
-      .catch(() => {
-        showNotification({
-          title: 'Something went wrong. ❌',
-          message: 'The thought link was not copied to clipboard.',
-          color: 'red'
-        });
-      });
-  };
-
   if (isError) {
     return (
       <Container>
@@ -90,40 +69,9 @@ export function ThoughtMetadata() {
       <Title order={1} my="lg">
         Thought metadata 💭
       </Title>
-      {thoughtMetadata?.thoughtKey && (
-        <Paper shadow="xs" p="md" my="md" withBorder>
-          <Text size="xl" weight="500">
-            Share the link:
-          </Text>
-          <Grid justify="space-between" align="center">
-            <Grid.Col span={11}>
-              <Code
-                color="yellow"
-                my="xs"
-                style={{ fontSize: '20px', cursor: 'copy' }}
-                onClick={(e) => selectElement(e.target as HTMLElement)}>
-                {thoughtLink}
-              </Code>
-            </Grid.Col>
-            <Grid.Col span={1}>
-              <ActionIcon
-                aria-label="Copy thought link to clipboard"
-                variant="outline"
-                onClick={() => copyToClipboard()}
-                size="lg"
-                style={{ marginLeft: 'auto' }}>
-                💾
-              </ActionIcon>
-            </Grid.Col>
-          </Grid>
-          <Text color="gray" size="sm">
-            Requires a passphrase.
-          </Text>
-          <Alert color="orange" title="Warning" my="sm">
-            It will disappear forever after you leave the page
-          </Alert>
-        </Paper>
-      )}
+
+      {thoughtMetadata?.thoughtKey && <Thought.ThoughtLink link={thoughtLink} />}
+
       <Paper shadow="xs" p="md" my="md" withBorder>
         <Text size="xl" weight="500">
           Thought ({thoughtMetadata?.abbreviatedThoughtKey})
