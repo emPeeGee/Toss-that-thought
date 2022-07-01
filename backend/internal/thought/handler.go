@@ -1,7 +1,6 @@
 package thought
 
 import (
-	"github.com/emPeeee/ttt/internal/entity"
 	"github.com/emPeeee/ttt/internal/flaw"
 	"github.com/emPeeee/ttt/pkg/log"
 	"github.com/gin-gonic/gin"
@@ -30,7 +29,7 @@ type handler struct {
 }
 
 func (h *handler) create(c *gin.Context) {
-	var input entity.ThoughtCreateInput
+	var input CreateDTO
 
 	if err := c.BindJSON(&input); err != nil {
 		flaw.BadRequest(c, "your request looks incorrect", err.Error())
@@ -97,7 +96,7 @@ func (h *handler) retrieveThought(c *gin.Context) {
 		return
 	}
 
-	var thoughtInput entity.ThoughtPassphraseInput
+	var thoughtInput PassphraseDTO
 	if err := c.BindJSON(&thoughtInput); err != nil {
 		flaw.BadRequest(c, "your request seems to be incorrect", err.Error())
 		return
@@ -122,7 +121,7 @@ func (h *handler) burnThought(c *gin.Context) {
 		return
 	}
 
-	var thoughtInput entity.ThoughtPassphraseInput
+	var thoughtInput PassphraseDTO
 	if err := c.BindJSON(&thoughtInput); err != nil {
 		flaw.BadRequest(c, "your request seems to be incorrect", err.Error())
 		return

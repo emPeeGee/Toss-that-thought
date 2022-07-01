@@ -9,10 +9,10 @@ import (
 )
 
 type Repository interface {
-	Create(input entity.ThoughtCreateInput) (entity.ThoughtCreateResponse, error)
-	RetrieveMetadata(metadataKey string) (entity.ThoughtMetadataResponse, error)
-	RetrieveThoughtByPassphrase(thoughtKey, passphrase string) (entity.ThoughtResponse, error)
-	RetrieveThoughtValidity(thoughtKey string) (entity.ThoughtValidityInformation, error)
+	Create(input CreateDTO) (CreateResponse, error)
+	RetrieveMetadata(metadataKey string) (MetadataResponse, error)
+	RetrieveThoughtByPassphrase(thoughtKey, passphrase string) (ViewThoughtResponse, error)
+	RetrieveThoughtValidity(thoughtKey string) (ValidityInformation, error)
 	CheckMetadataExists(metadataKey string) error
 	BurnThought(metadataKey, passphrase string) error
 	MarkAsViewed(thoughtKey, passphrase string) error
@@ -29,7 +29,7 @@ func NewRepository(db *gorm.DB, logger log.Logger) *repository {
 	return &repository{db: db, logger: logger}
 }
 
-func (r *repository) Create(input entity.ThoughtCreateInput) (entity.ThoughtCreateResponse, error) {
+func (r *repository) Create(input CreateDTO) (CreateResponse, error) {
 
 	thought := entity.Thought{
 		Thought:    input.Thought,
@@ -38,10 +38,10 @@ func (r *repository) Create(input entity.ThoughtCreateInput) (entity.ThoughtCrea
 	}
 
 	if err := r.db.Create(&thought).Error; err != nil {
-		return entity.ThoughtCreateResponse{}, err
+		return CreateResponse{}, err
 	}
 
-	return entity.ThoughtCreateResponse{
+	return CreateResponse{
 		Lifetime:              thought.Lifetime,
 		MetadataKey:           thought.MetadataKey,
 		ThoughtKey:            thought.ThoughtKey,
@@ -50,19 +50,19 @@ func (r *repository) Create(input entity.ThoughtCreateInput) (entity.ThoughtCrea
 	}, nil
 }
 
-func (r *repository) RetrieveMetadata(metadataKey string) (entity.ThoughtMetadataResponse, error) {
+func (r *repository) RetrieveMetadata(metadataKey string) (MetadataResponse, error) {
 
-	var thoughtMetadata entity.ThoughtMetadataResponse
+	var thoughtMetadata MetadataResponse
 	err := r.db.Model(&entity.Thought{}).First(&thoughtMetadata, "metadata_key = ?", metadataKey).Error
 
 	return thoughtMetadata, err
 }
 
-func (r *repository) RetrieveThoughtValidity(thoughtKey string) (entity.ThoughtValidityInformation, error) {
-	var thoughtValidityInfo entity.ThoughtValidityInformation
+func (r *repository) RetrieveThoughtValidity(thoughtKey string) (ValidityInformation, error) {
+	var thoughtValidityInfo ValidityInformation
 
 	if err := r.db.Model(&entity.Thought{}).First(&thoughtValidityInfo, "thought_key = ?", thoughtKey).Error; err != nil {
-		return entity.ThoughtValidityInformation{}, err
+		return ValidityInformation{}, err
 	}
 
 	return thoughtValidityInfo, nil
@@ -83,11 +83,11 @@ func (r *repository) CheckMetadataExists(metadataKey string) error {
 	return nil
 }
 
-func (r *repository) RetrieveThoughtByPassphrase(thoughtKey, passphrase string) (entity.ThoughtResponse, error) {
-	var thoughtResponse entity.ThoughtResponse
+func (r *repository) RetrieveThoughtByPassphrase(thoughtKey, passphrase string) (ViewThoughtResponse, error) {
+	var thoughtResponse ViewThoughtResponse
 
 	if err := r.db.Model(&entity.Thought{}).First(&thoughtResponse, "thought_key = ? AND passphrase = ?", thoughtKey, passphrase).Error; err != nil {
-		return entity.ThoughtResponse{}, err
+		return ViewThoughtResponse{}, err
 	}
 
 	return thoughtResponse, nil

@@ -2,17 +2,16 @@ package thought
 
 import (
 	"errors"
-	"github.com/emPeeee/ttt/internal/entity"
 	"github.com/emPeeee/ttt/pkg/crypt"
 	"github.com/emPeeee/ttt/pkg/log"
 	"time"
 )
 
 type Service interface {
-	Create(input entity.ThoughtCreateInput) (entity.ThoughtCreateResponse, error)
-	RetrieveMetadata(metadataKey string) (entity.ThoughtMetadataResponse, error)
-	RetrieveThoughtByPassphrase(thoughtKey, passphrase string) (entity.ThoughtResponse, error)
-	RetrieveThoughtPassphraseInfo(thoughtKey string) (entity.ThoughtPassphraseInformationResponse, error)
+	Create(input CreateDTO) (CreateResponse, error)
+	RetrieveMetadata(metadataKey string) (MetadataResponse, error)
+	RetrieveThoughtByPassphrase(thoughtKey, passphrase string) (ViewThoughtResponse, error)
+	RetrieveThoughtPassphraseInfo(thoughtKey string) (PassphraseInformationResponse, error)
 	IsThoughtValid(thoughtKey string) error
 	CheckMetadataExists(metadataKey string) error
 	BurnThought(metadataKey, passphrase string) error
@@ -27,11 +26,11 @@ func NewThoughtService(repo Repository, logger log.Logger) *service {
 	return &service{repo: repo, logger: logger}
 }
 
-func (s *service) Create(input entity.ThoughtCreateInput) (entity.ThoughtCreateResponse, error) {
+func (s *service) Create(input CreateDTO) (CreateResponse, error) {
 	if len(input.Passphrase) != 0 {
 		hashedPassphrase, err := crypt.HashPassphrase(input.Passphrase)
 		if err != nil {
-			return entity.ThoughtCreateResponse{}, err
+			return CreateResponse{}, err
 		}
 		input.Passphrase = hashedPassphrase
 	}
@@ -44,14 +43,14 @@ func (s *service) Create(input entity.ThoughtCreateInput) (entity.ThoughtCreateR
 	return createdThought, err
 }
 
-func (s *service) RetrieveMetadata(metadataKey string) (entity.ThoughtMetadataResponse, error) {
+func (s *service) RetrieveMetadata(metadataKey string) (MetadataResponse, error) {
 	metadata, err := s.repo.RetrieveMetadata(metadataKey)
 	if err == nil {
 		metadata.AbbreviatedThoughtKey = metadata.AbbreviatedThoughtKey[:6]
 	}
 
 	if time.Now().After(metadata.Lifetime) {
-		return entity.ThoughtMetadataResponse{}, errors.New("it either never existed or already has been viewed")
+		return MetadataResponse{}, errors.New("it either never existed or already has been viewed")
 	}
 
 	return metadata, err
@@ -73,43 +72,43 @@ func (s *service) IsThoughtValid(thoughtKey string) error {
 	return nil
 }
 
-func (s *service) RetrieveThoughtPassphraseInfo(thoughtKey string) (entity.ThoughtPassphraseInformationResponse, error) {
+func (s *service) RetrieveThoughtPassphraseInfo(thoughtKey string) (PassphraseInformationResponse, error) {
 	err := s.IsThoughtValid(thoughtKey)
 	if err != nil {
-		return entity.ThoughtPassphraseInformationResponse{}, err
+		return PassphraseInformationResponse{}, err
 	}
 
 	hashedPassphrase, err := s.repo.GetPassphraseOfThoughtByThoughtKey(thoughtKey)
 	if err != nil {
-		return entity.ThoughtPassphraseInformationResponse{}, err
+		return PassphraseInformationResponse{}, err
 	}
 
 	canPassphraseSkipped := len(hashedPassphrase) <= 0
 
-	return entity.ThoughtPassphraseInformationResponse{CanPassphraseBeSkipped: canPassphraseSkipped}, nil
+	return PassphraseInformationResponse{CanPassphraseBeSkipped: canPassphraseSkipped}, nil
 }
 
 func (s *service) CheckMetadataExists(metadataKey string) error {
 	return s.repo.CheckMetadataExists(metadataKey)
 }
 
-func (s *service) RetrieveThoughtByPassphrase(thoughtKey, passphrase string) (entity.ThoughtResponse, error) {
+func (s *service) RetrieveThoughtByPassphrase(thoughtKey, passphrase string) (ViewThoughtResponse, error) {
 	hashedPassphrase, err := s.repo.GetPassphraseOfThoughtByThoughtKey(thoughtKey)
 	if err != nil {
-		return entity.ThoughtResponse{}, err
+		return ViewThoughtResponse{}, err
 	}
 
 	if len(hashedPassphrase) != 0 && crypt.CheckPasswordHashes(passphrase, hashedPassphrase) == false {
-		return entity.ThoughtResponse{}, errors.New("password does not match")
+		return ViewThoughtResponse{}, errors.New("password does not match")
 	}
 
 	thoughtResponse, err := s.repo.RetrieveThoughtByPassphrase(thoughtKey, hashedPassphrase)
 	if err != nil {
-		return entity.ThoughtResponse{}, err
+		return ViewThoughtResponse{}, err
 	}
 
 	if err := s.repo.MarkAsViewed(thoughtKey, hashedPassphrase); err != nil {
-		return entity.ThoughtResponse{}, errors.New("something went wrong")
+		return ViewThoughtResponse{}, errors.New("something went wrong")
 	}
 
 	return thoughtResponse, nil
