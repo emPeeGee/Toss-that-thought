@@ -30,7 +30,6 @@ func NewRepository(db *gorm.DB, logger log.Logger) *repository {
 }
 
 func (r *repository) Create(input CreateDTO) (CreateResponse, error) {
-
 	thought := entity.Thought{
 		Thought:    input.Thought,
 		Passphrase: input.Passphrase,

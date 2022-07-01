@@ -1,0 +1,19 @@
+### Create user
+POST http://localhost:9000/api/signUp
+Content-Type: application/json
+
+{
+  "name": "Master Flamaster",
+  "username": "name",
+  "password": "1111"
+}
+
+### Login with user
+POST http://localhost:9000/api/signIn
+Content-Type: application/json
+
+{
+  "username": "name",
+  "password": "1111"
+}
+

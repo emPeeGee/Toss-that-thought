@@ -7,9 +7,9 @@ import (
 
 type Thought struct {
 	Id          int        `json:"id"`
-	Thought     string     `json:"thought" validate:"required" gorm:"notNull"`
-	Passphrase  string     `json:"passphrase" validate:"required" gorm:"notNull;size:255"`
-	Lifetime    time.Time  `json:"lifetime" validate:"required" gorm:"notNull"`
+	Thought     string     `json:"thought" gorm:"notNull"`
+	Passphrase  string     `json:"passphrase" gorm:"notNull;size:255"`
+	Lifetime    time.Time  `json:"lifetime" gorm:"notNull"`
 	IsBurned    bool       `json:"isBurned" gorm:"default:false;notNull"`
 	IsViewed    bool       `json:"isViewed" gorm:"default:false;notNull"`
 	BurnedDate  *time.Time `json:"burnedDate"`

@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"github.com/emPeeee/ttt/internal/auth"
 	"github.com/emPeeee/ttt/internal/config"
 	"github.com/emPeeee/ttt/internal/connection"
 	"github.com/emPeeee/ttt/internal/cors"
@@ -40,7 +41,7 @@ func main() {
 		logger.Fatalf("failed to initialize db: %s", err.Error())
 	}
 
-	err = db.AutoMigrate(&entity.Thought{})
+	err = db.AutoMigrate(&entity.Thought{}, &entity.User{})
 	if err != nil {
 		logger.Fatalf("failed to auto migrate gorm", err.Error())
 	}
@@ -71,10 +72,18 @@ func main() {
 func buildHandler(db *gorm.DB, valid *validator.Validate, logger log.Logger) http.Handler {
 	router := gin.New()
 	router.Use(accesslog.Handler(logger), flaw.Handler(logger), cors.Handler())
+	rg := router.Group("/api")
 
 	thought.RegisterHandlers(
-		router.Group("/api"),
+		rg,
 		thought.NewThoughtService(thought.NewRepository(db, logger), logger),
+		valid,
+		logger,
+	)
+
+	auth.RegisterHandlers(
+		rg,
+		auth.NewAuthService(auth.NewAuthRepository(db, logger), logger),
 		valid,
 		logger,
 	)
