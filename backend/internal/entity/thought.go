@@ -23,6 +23,7 @@ type ThoughtPassphraseInput struct {
 	Passphrase string `json:"passphrase" validate:"required,max=255"`
 }
 
+// TODO: Very abstract name
 type ThoughtResponse struct {
 	Thought string `json:"thought" db:"thought"`
 }
@@ -32,6 +33,10 @@ type ThoughtValidityInformation struct {
 	IsBurned   bool      `json:"isBurned" db:"is_burned"`
 	Lifetime   time.Time `json:"lifetime" db:"lifetime"`
 	IsViewed   bool      `json:"isViewed" db:"is_viewed"`
+}
+
+type ThoughtPassphraseInformationResponse struct {
+	CanPassphraseBeSkipped bool `json:"canPassphraseBeSkipped"`
 }
 
 type ThoughtMetadataResponse struct {

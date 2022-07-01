@@ -15,9 +15,9 @@ func RegisterHandlers(r *gin.RouterGroup, service Service, validate *validator.V
 
 	api := r.Group("")
 	{
-		api.POST("/create", h.create) // Good to rename endpoint
+		api.POST("/create", h.create)
 		api.GET("/metadata/:id", h.retrieveMetadata)
-		api.GET("/thought/:id", h.thoughtValidity)
+		api.GET("/thought/:id", h.retrieveThoughtPassphraseInfo)
 		api.POST("/thought/:id", h.retrieveThought)
 		api.POST("/thought/:id/burn", h.burnThought)
 	}
@@ -45,7 +45,7 @@ func (h *handler) create(c *gin.Context) {
 	// TODO: Future, to make a validator for this https://github.com/go-playground/validator/issues/494
 	maxLifetime := time.Now().AddDate(0, 0, 7)
 	if input.Lifetime.After(maxLifetime) {
-		flaw.BadRequest(c, "lifetime cannot be so long", "lifetime cannot be more thatn 7 days")
+		flaw.BadRequest(c, "lifetime cannot be so long", "lifetime cannot be more that 7 days")
 		return
 	}
 
@@ -76,18 +76,16 @@ func (h *handler) retrieveMetadata(c *gin.Context) {
 	c.JSON(http.StatusOK, thoughtMetadata)
 }
 
-func (h *handler) thoughtValidity(c *gin.Context) {
+func (h *handler) retrieveThoughtPassphraseInfo(c *gin.Context) {
 	thoughtKey := c.Param("id")
 
-	err := h.service.IsThoughtValid(thoughtKey)
+	info, err := h.service.RetrieveThoughtPassphraseInfo(thoughtKey)
 	if err != nil {
 		flaw.NotFound(c, "thought it either never existed or already has been viewed", err.Error())
 		return
 	}
 
-	c.JSON(http.StatusOK, map[string]interface{}{
-		"ok": true,
-	})
+	c.JSON(http.StatusOK, info)
 }
 
 func (h *handler) retrieveThought(c *gin.Context) {
@@ -99,19 +97,19 @@ func (h *handler) retrieveThought(c *gin.Context) {
 		return
 	}
 
-	var accessThoughtInput entity.ThoughtPassphraseInput
-	if err := c.BindJSON(&accessThoughtInput); err != nil {
+	var thoughtInput entity.ThoughtPassphraseInput
+	if err := c.BindJSON(&thoughtInput); err != nil {
 		flaw.BadRequest(c, "your request seems to be incorrect", err.Error())
 		return
 	}
 
-	accessThoughtResponse, err := h.service.RetrieveThought(thoughtKey, accessThoughtInput.Passphrase)
+	thoughtResponse, err := h.service.RetrieveThoughtByPassphrase(thoughtKey, thoughtInput.Passphrase)
 	if err != nil {
 		flaw.BadRequest(c, "incorrect password", err.Error())
 		return
 	}
 
-	c.JSON(http.StatusOK, accessThoughtResponse)
+	c.JSON(http.StatusOK, thoughtResponse)
 }
 
 // Dublicated code with checking thought if exists
@@ -124,13 +122,13 @@ func (h *handler) burnThought(c *gin.Context) {
 		return
 	}
 
-	var accessThoughtInput entity.ThoughtPassphraseInput
-	if err := c.BindJSON(&accessThoughtInput); err != nil {
+	var thoughtInput entity.ThoughtPassphraseInput
+	if err := c.BindJSON(&thoughtInput); err != nil {
 		flaw.BadRequest(c, "your request seems to be incorrect", err.Error())
 		return
 	}
 
-	err = h.service.BurnThought(metadataKey, accessThoughtInput.Passphrase)
+	err = h.service.BurnThought(metadataKey, thoughtInput.Passphrase)
 	if err != nil {
 		flaw.BadRequest(c, "passphrase is incorrect", err.Error())
 		return

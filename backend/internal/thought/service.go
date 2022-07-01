@@ -11,7 +11,8 @@ import (
 type Service interface {
 	Create(input entity.ThoughtCreateInput) (entity.ThoughtCreateResponse, error)
 	RetrieveMetadata(metadataKey string) (entity.ThoughtMetadataResponse, error)
-	RetrieveThought(thoughtKey, passphrase string) (entity.ThoughtResponse, error)
+	RetrieveThoughtByPassphrase(thoughtKey, passphrase string) (entity.ThoughtResponse, error)
+	RetrieveThoughtPassphraseInfo(thoughtKey string) (entity.ThoughtPassphraseInformationResponse, error)
 	IsThoughtValid(thoughtKey string) error
 	CheckMetadataExists(metadataKey string) error
 	BurnThought(metadataKey, passphrase string) error
@@ -72,11 +73,27 @@ func (s *service) IsThoughtValid(thoughtKey string) error {
 	return nil
 }
 
+func (s *service) RetrieveThoughtPassphraseInfo(thoughtKey string) (entity.ThoughtPassphraseInformationResponse, error) {
+	err := s.IsThoughtValid(thoughtKey)
+	if err != nil {
+		return entity.ThoughtPassphraseInformationResponse{}, err
+	}
+
+	hashedPassphrase, err := s.repo.GetPassphraseOfThoughtByThoughtKey(thoughtKey)
+	if err != nil {
+		return entity.ThoughtPassphraseInformationResponse{}, err
+	}
+
+	canPassphraseSkipped := len(hashedPassphrase) <= 0
+
+	return entity.ThoughtPassphraseInformationResponse{CanPassphraseBeSkipped: canPassphraseSkipped}, nil
+}
+
 func (s *service) CheckMetadataExists(metadataKey string) error {
 	return s.repo.CheckMetadataExists(metadataKey)
 }
 
-func (s *service) RetrieveThought(thoughtKey, passphrase string) (entity.ThoughtResponse, error) {
+func (s *service) RetrieveThoughtByPassphrase(thoughtKey, passphrase string) (entity.ThoughtResponse, error) {
 	hashedPassphrase, err := s.repo.GetPassphraseOfThoughtByThoughtKey(thoughtKey)
 	if err != nil {
 		return entity.ThoughtResponse{}, err
@@ -86,7 +103,7 @@ func (s *service) RetrieveThought(thoughtKey, passphrase string) (entity.Thought
 		return entity.ThoughtResponse{}, errors.New("password does not match")
 	}
 
-	thoughtResponse, err := s.repo.RetrieveThought(thoughtKey, hashedPassphrase)
+	thoughtResponse, err := s.repo.RetrieveThoughtByPassphrase(thoughtKey, hashedPassphrase)
 	if err != nil {
 		return entity.ThoughtResponse{}, err
 	}
@@ -131,3 +148,7 @@ func (s *service) BurnThought(metadataKey, passphrase string) error {
 
 	return s.repo.BurnThought(metadataKey, hashedPassphrase)
 }
+
+// Entity -> entity
+// Input -> DTO in thought module
+// Response -> thought module

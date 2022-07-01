@@ -11,7 +11,7 @@ import (
 type Repository interface {
 	Create(input entity.ThoughtCreateInput) (entity.ThoughtCreateResponse, error)
 	RetrieveMetadata(metadataKey string) (entity.ThoughtMetadataResponse, error)
-	RetrieveThought(thoughtKey, passphrase string) (entity.ThoughtResponse, error)
+	RetrieveThoughtByPassphrase(thoughtKey, passphrase string) (entity.ThoughtResponse, error)
 	RetrieveThoughtValidity(thoughtKey string) (entity.ThoughtValidityInformation, error)
 	CheckMetadataExists(metadataKey string) error
 	BurnThought(metadataKey, passphrase string) error
@@ -83,7 +83,7 @@ func (r *repository) CheckMetadataExists(metadataKey string) error {
 	return nil
 }
 
-func (r *repository) RetrieveThought(thoughtKey, passphrase string) (entity.ThoughtResponse, error) {
+func (r *repository) RetrieveThoughtByPassphrase(thoughtKey, passphrase string) (entity.ThoughtResponse, error) {
 	var thoughtResponse entity.ThoughtResponse
 
 	if err := r.db.Model(&entity.Thought{}).First(&thoughtResponse, "thought_key = ? AND passphrase = ?", thoughtKey, passphrase).Error; err != nil {
