@@ -1,6 +1,7 @@
 package thought
 
 import (
+	"github.com/emPeeee/ttt/internal/auth"
 	"github.com/emPeeee/ttt/internal/flaw"
 	"github.com/emPeeee/ttt/pkg/log"
 	"github.com/gin-gonic/gin"
@@ -28,8 +29,17 @@ type handler struct {
 	validate *validator.Validate
 }
 
+// such user already exists?
 func (h *handler) create(c *gin.Context) {
 	var input CreateDTO
+
+	// TODO: handle authenticated users
+	userId, err := auth.GetUserId(c)
+	if err != nil {
+		h.logger.Debug(err.Error(), "Not authenticated")
+	} else {
+		h.logger.Debug(userId, "Authenticated")
+	}
 
 	if err := c.BindJSON(&input); err != nil {
 		flaw.BadRequest(c, "your request looks incorrect", err.Error())

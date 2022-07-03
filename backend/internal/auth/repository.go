@@ -7,9 +7,9 @@ import (
 )
 
 type Repository interface {
-	CreateUser(user CreateUserDTO) error
-	GetUserByUsername(username string) (entity.User, error)
-	GetHashedPasswordByUsername(username string) (UserHashedPassword, error)
+	createUser(user createUserDTO) error
+	getUserByUsername(username string) (entity.User, error)
+	getHashedPasswordByUsername(username string) (userHashedPassword, error)
 }
 
 type repository struct {
@@ -21,7 +21,7 @@ func NewAuthRepository(db *gorm.DB, logger log.Logger) *repository {
 	return &repository{db: db, logger: logger}
 }
 
-func (r *repository) CreateUser(user CreateUserDTO) error {
+func (r *repository) createUser(user createUserDTO) error {
 	// maybe dto is not needed here?
 	newUser := entity.User{
 		Username: user.Username,
@@ -36,7 +36,7 @@ func (r *repository) CreateUser(user CreateUserDTO) error {
 	return nil
 }
 
-func (r *repository) GetUserByUsername(username string) (entity.User, error) {
+func (r *repository) getUserByUsername(username string) (entity.User, error) {
 	var user entity.User
 	// TODO if First if first when where does not have effect
 
@@ -47,12 +47,12 @@ func (r *repository) GetUserByUsername(username string) (entity.User, error) {
 	return user, nil
 }
 
-func (r *repository) GetHashedPasswordByUsername(username string) (UserHashedPassword, error) {
-	var userHashedPassword UserHashedPassword
+func (r *repository) getHashedPasswordByUsername(username string) (userHashedPassword, error) {
+	var userPassword userHashedPassword
 
-	if err := r.db.Model(&entity.User{}).Where("username = ?", username).First(&userHashedPassword).Error; err != nil {
-		return UserHashedPassword{}, err
+	if err := r.db.Model(&entity.User{}).Where("username = ?", username).First(&userPassword).Error; err != nil {
+		return userHashedPassword{}, err
 	}
 
-	return userHashedPassword, nil
+	return userPassword, nil
 }

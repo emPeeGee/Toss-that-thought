@@ -72,18 +72,19 @@ func main() {
 func buildHandler(db *gorm.DB, valid *validator.Validate, logger log.Logger) http.Handler {
 	router := gin.New()
 	router.Use(accesslog.Handler(logger), flaw.Handler(logger), cors.Handler())
-	rg := router.Group("/api")
 
-	thought.RegisterHandlers(
-		rg,
-		thought.NewThoughtService(thought.NewRepository(db, logger), logger),
+	authRg := router.Group("/auth")
+	auth.RegisterHandlers(
+		authRg,
+		auth.NewAuthService(auth.NewAuthRepository(db, logger), logger),
 		valid,
 		logger,
 	)
 
-	auth.RegisterHandlers(
-		rg,
-		auth.NewAuthService(auth.NewAuthRepository(db, logger), logger),
+	apiRg := router.Group("/api", auth.HandleUserIdentity(logger))
+	thought.RegisterHandlers(
+		apiRg,
+		thought.NewThoughtService(thought.NewRepository(db, logger), logger),
 		valid,
 		logger,
 	)

@@ -25,7 +25,7 @@ type handler struct {
 }
 
 func (h *handler) signUp(c *gin.Context) {
-	var input CreateUserDTO
+	var input createUserDTO
 
 	if err := c.BindJSON(&input); err != nil {
 		flaw.BadRequest(c, "your request looks incorrect", err.Error())
@@ -39,7 +39,7 @@ func (h *handler) signUp(c *gin.Context) {
 		return
 	}
 
-	err := h.service.CreateUser(input)
+	err := h.service.createUser(input)
 	if err != nil {
 		flaw.InternalServer(c, "something went wrong, we are working", err.Error())
 		return
@@ -51,19 +51,19 @@ func (h *handler) signUp(c *gin.Context) {
 }
 
 func (h *handler) signIn(c *gin.Context) {
-	var credentials CredentialsDTO
+	var credentials credentialsDTO
 
 	if err := c.BindJSON(&credentials); err != nil {
 		flaw.BadRequest(c, "incorrect body", err.Error())
 		return
 	}
 
-	//if err := h.validate.Struct(credentials); err != nil {
-	//	flaw.BadRequest(c, "incorrect body", err.Error())
-	//	return
-	//}
+	if err := h.validate.Struct(credentials); err != nil {
+		flaw.BadRequest(c, "incorrect body", err.Error())
+		return
+	}
 
-	token, err := h.service.GenerateToken(credentials)
+	token, err := h.service.generateToken(credentials)
 	if err != nil {
 		flaw.InternalServer(c, "something went wrong, we are working", err.Error())
 		return

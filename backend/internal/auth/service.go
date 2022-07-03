@@ -10,14 +10,13 @@ import (
 )
 
 const (
-	salt       = "%$#^#GDGD$1231fs!321k543x@@cfg5%!fd22414sh"
 	signingKey = "bv646gf930ds^#fg&)Fd_)))*("
 	tokenTTL   = time.Hour * 12
 )
 
 type Service interface {
-	CreateUser(input CreateUserDTO) error
-	GenerateToken(credentials CredentialsDTO) (string, error)
+	createUser(input createUserDTO) error
+	generateToken(credentials credentialsDTO) (string, error)
 }
 
 type service struct {
@@ -34,7 +33,7 @@ func NewAuthService(repository Repository, logger log.Logger) *service {
 	return &service{repo: repository, logger: logger}
 }
 
-func (s *service) CreateUser(user CreateUserDTO) error {
+func (s *service) createUser(user createUserDTO) error {
 	// TODO crypt
 	hashedPassword, err := crypt.HashPassphrase(user.Password)
 	if err != nil {
@@ -45,15 +44,15 @@ func (s *service) CreateUser(user CreateUserDTO) error {
 
 	s.logger.Debug(user)
 
-	err = s.repo.CreateUser(user)
+	err = s.repo.createUser(user)
 	if err != nil {
 		return err
 	}
 
 	return nil
 }
-func (s *service) GenerateToken(credentials CredentialsDTO) (string, error) {
-	hashedPassword, err := s.repo.GetHashedPasswordByUsername(credentials.Username)
+func (s *service) generateToken(credentials credentialsDTO) (string, error) {
+	hashedPassword, err := s.repo.getHashedPasswordByUsername(credentials.Username)
 	if err != nil {
 		return "", err
 	}
@@ -65,7 +64,7 @@ func (s *service) GenerateToken(credentials CredentialsDTO) (string, error) {
 		return "", errors.New("password does not match")
 	}
 
-	user, err := s.repo.GetUserByUsername(credentials.Username)
+	user, err := s.repo.getUserByUsername(credentials.Username)
 	if err != nil {
 		return "", err
 	}
@@ -84,5 +83,3 @@ func (s *service) GenerateToken(credentials CredentialsDTO) (string, error) {
 
 	return token.SignedString([]byte(signingKey))
 }
-
-// TODO: to be added associations and checking jwt

@@ -1,5 +1,5 @@
 ### Create user
-POST http://localhost:9000/api/signUp
+POST http://localhost:9000/auth/signUp
 Content-Type: application/json
 
 {
@@ -9,11 +9,16 @@ Content-Type: application/json
 }
 
 ### Login with user
-POST http://localhost:9000/api/signIn
+POST http://localhost:9000/auth/signIn
 Content-Type: application/json
 
 {
   "username": "name",
   "password": "1111"
 }
+
+> {%
+ client.global.set("token", response.body.token)
+%}
+
 
