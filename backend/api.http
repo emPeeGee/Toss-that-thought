@@ -93,3 +93,10 @@ Content-Type: application/json
 {
   "passphrase": "1121"
 }
+
+### Get recent
+GET http://localhost:9000/api/recent
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+

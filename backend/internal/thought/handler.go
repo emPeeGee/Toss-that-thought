@@ -20,6 +20,7 @@ func RegisterHandlers(r *gin.RouterGroup, service Service, validate *validator.V
 		api.GET("/thought/:id", h.retrieveThoughtPassphraseInfo)
 		api.POST("/thought/:id", h.retrieveThought)
 		api.POST("/thought/:id/burn", h.burnThought)
+		api.GET("/recent", h.getThoughtsMetadataByUser)
 	}
 }
 
@@ -151,4 +152,25 @@ func (h *handler) burnThought(c *gin.Context) {
 	c.JSON(http.StatusOK, map[string]interface{}{
 		"ok": true,
 	})
+}
+
+func (h *handler) getThoughtsMetadataByUser(c *gin.Context) {
+	userId, err := auth.GetUserId(c)
+	if err != nil {
+		flaw.Unauthorized(c, err.Error(), "")
+		return
+	}
+
+	if userId == nil {
+		flaw.Unauthorized(c, "you are not authorized", "")
+		return
+	}
+
+	thoughtsMetadata, err := h.service.GetThoughtsMetadataByUser(*userId)
+	if err != nil {
+		flaw.InternalServer(c, "something went wrong, we are working", err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, thoughtsMetadata)
 }

@@ -18,6 +18,7 @@ type Repository interface {
 	MarkAsViewed(thoughtKey, passphrase string) error
 	GetPassphraseOfThoughtByMetadataKey(metadataKey string) (string, error)
 	GetPassphraseOfThoughtByThoughtKey(thoughtKey string) (string, error)
+	GetThoughtsMetadataByUser(userId uint) ([]MetadataResponse, error)
 }
 
 type repository struct {
@@ -143,4 +144,20 @@ func (r *repository) GetPassphraseOfThoughtByThoughtKey(thoughtKey string) (stri
 	}
 
 	return passphrase, nil
+}
+
+func (r *repository) GetThoughtsMetadataByUser(userId uint) ([]MetadataResponse, error) {
+	var thoughtsMetadata []MetadataResponse
+	var user entity.User
+
+	if err := r.db.Model(&user).Where("id = ?", userId).First(&user).Error; err != nil {
+		return nil, err
+	}
+
+	// TODO: .Where("current_timestamp() > lifetime") ????
+	if err := r.db.Model(&user).Order("created_date asc").Association("Thoughts").Find(&thoughtsMetadata); err != nil {
+		return nil, err
+	}
+
+	return thoughtsMetadata, nil
 }

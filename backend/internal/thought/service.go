@@ -15,6 +15,7 @@ type Service interface {
 	IsThoughtValid(thoughtKey string) error
 	CheckMetadataExists(metadataKey string) error
 	BurnThought(metadataKey, passphrase string) error
+	GetThoughtsMetadataByUser(userId uint) ([]MetadataResponse, error)
 }
 
 type service struct {
@@ -148,6 +149,15 @@ func (s *service) BurnThought(metadataKey, passphrase string) error {
 	return s.repo.BurnThought(metadataKey, hashedPassphrase)
 }
 
-// Entity -> entity
-// Input -> DTO in thought module
-// Response -> thought module
+func (s *service) GetThoughtsMetadataByUser(userId uint) ([]MetadataResponse, error) {
+	thoughtsMetadata, err := s.repo.GetThoughtsMetadataByUser(userId)
+	if err != nil {
+		return nil, err
+	}
+
+	for idx, metadata := range thoughtsMetadata {
+		thoughtsMetadata[idx].AbbreviatedThoughtKey = metadata.AbbreviatedThoughtKey[:6]
+	}
+
+	return thoughtsMetadata, nil
+}
