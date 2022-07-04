@@ -8,13 +8,18 @@ import (
 	"net/http"
 )
 
-func RegisterHandlers(r *gin.RouterGroup, service Service, validate *validator.Validate, logger log.Logger) {
+func RegisterHandlers(authRg, apiRg *gin.RouterGroup, service Service, validate *validator.Validate, logger log.Logger) {
 	h := handler{service, logger, validate}
 
-	api := r.Group("")
+	auth := authRg.Group("")
 	{
-		api.POST("/signUp", h.signUp)
-		api.POST("/signIn", h.signIn)
+		auth.POST("/signUp", h.signUp)
+		auth.POST("/signIn", h.signIn)
+	}
+
+	api := apiRg.Group("")
+	{
+		api.GET("/user", h.getUser)
 	}
 }
 
@@ -74,4 +79,25 @@ func (h *handler) signIn(c *gin.Context) {
 	c.JSON(http.StatusOK, map[string]interface{}{
 		"token": token,
 	})
+}
+
+func (h *handler) getUser(c *gin.Context) {
+	userId, err := GetUserId(c)
+	if err != nil {
+		flaw.Unauthorized(c, err.Error(), "")
+		return
+	}
+
+	if userId == nil {
+		flaw.Unauthorized(c, "you are not authorized", "")
+		return
+	}
+
+	user, err := h.service.getUserById(*userId)
+	if err != nil {
+		flaw.InternalServer(c, "something went wrong, we are working", err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, user)
 }

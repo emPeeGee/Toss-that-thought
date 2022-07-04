@@ -8,6 +8,7 @@ import (
 
 type Repository interface {
 	createUser(user createUserDTO) error
+	getUserById(id uint) (UserResponse, error)
 	getUserByUsername(username string) (entity.User, error)
 	getHashedPasswordByUsername(username string) (userHashedPassword, error)
 }
@@ -55,4 +56,14 @@ func (r *repository) getHashedPasswordByUsername(username string) (userHashedPas
 	}
 
 	return userPassword, nil
+}
+
+func (r *repository) getUserById(id uint) (UserResponse, error) {
+	var user UserResponse
+
+	if err := r.db.Model(&entity.User{}).Where("id = ?", id).First(&user).Error; err != nil {
+		return UserResponse{}, err
+	}
+
+	return user, nil
 }

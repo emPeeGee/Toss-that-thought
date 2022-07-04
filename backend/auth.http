@@ -22,3 +22,7 @@ Content-Type: application/json
 %}
 
 
+### GET user info
+GET http://localhost:9000/api/user
+Content-Type: application/json
+Authorization: Bearer {{token}}

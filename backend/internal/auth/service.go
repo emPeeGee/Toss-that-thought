@@ -17,6 +17,7 @@ const (
 type Service interface {
 	createUser(input createUserDTO) error
 	generateToken(credentials credentialsDTO) (string, error)
+	getUserById(id uint) (UserResponse, error)
 }
 
 type service struct {
@@ -82,4 +83,8 @@ func (s *service) generateToken(credentials credentialsDTO) (string, error) {
 	})
 
 	return token.SignedString([]byte(signingKey))
+}
+
+func (s *service) getUserById(id uint) (UserResponse, error) {
+	return s.repo.getUserById(id)
 }

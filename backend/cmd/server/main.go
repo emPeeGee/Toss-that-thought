@@ -23,6 +23,8 @@ import (
 
 const Version = "1.0.0"
 
+// TODO: jwt config to be extracted
+
 // RUN: Before autoMigrate -> CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 func main() {
 	logger := log.New().With(nil, "version", Version)
@@ -74,14 +76,16 @@ func buildHandler(db *gorm.DB, valid *validator.Validate, logger log.Logger) htt
 	router.Use(accesslog.Handler(logger), flaw.Handler(logger), cors.Handler())
 
 	authRg := router.Group("/auth")
+	apiRg := router.Group("/api", auth.HandleUserIdentity(logger))
+
 	auth.RegisterHandlers(
 		authRg,
+		apiRg,
 		auth.NewAuthService(auth.NewAuthRepository(db, logger), logger),
 		valid,
 		logger,
 	)
 
-	apiRg := router.Group("/api", auth.HandleUserIdentity(logger))
 	thought.RegisterHandlers(
 		apiRg,
 		thought.NewThoughtService(thought.NewRepository(db, logger), logger),
