@@ -1,8 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { MoonStars, Sun } from 'tabler-icons-react';
 import { ActionIcon, Text, useMantineColorScheme } from '@mantine/core';
 
+import { UserContext } from 'features/authentication/user.context';
 import { Anchor } from 'components/navigation/Anchor/Anchor';
+import { useToken } from 'hooks/useToken';
 import logo from 'assets/logo.svg';
 import {
   IconGroup,
@@ -17,10 +19,18 @@ import {
 export function Header() {
   const { colorScheme, toggleColorScheme } = useMantineColorScheme();
   const [isDark, setIsDark] = useState(false);
+  const userContext = useContext(UserContext);
+  const { setToken } = useToken();
 
   useEffect(() => {
     setIsDark(colorScheme === 'dark');
   }, [colorScheme]);
+
+  const logout = () => {
+    console.log('Logout');
+    setToken('');
+    userContext?.setUser(null);
+  };
 
   return (
     <Wrapper>
@@ -41,14 +51,29 @@ export function Header() {
               {isDark ? <Sun size={18} /> : <MoonStars size={18} />}
             </ActionIcon>
             <ListItem>
-              <Anchor to="sign-up" title="Create Account" />
-            </ListItem>
-            <ListItem>
               <Anchor to="about" title="About" />
             </ListItem>
-            <ListItem>
-              <Anchor to="sign-in" title="Sign In" />
-            </ListItem>
+
+            {userContext?.user ? (
+              <>
+                <ListItem>
+                  <Anchor to="profile" title={userContext?.user?.username ?? 'Profile'} />
+                </ListItem>
+                <ListItem onClick={() => logout()}>
+                  <Anchor to="/" title="Log out" />
+                </ListItem>
+              </>
+            ) : (
+              <>
+                <ListItem>
+                  <Anchor to="sign-in" title="Sign In" />
+                </ListItem>
+
+                <ListItem>
+                  <Anchor to="sign-up" title="Sign Up" />
+                </ListItem>
+              </>
+            )}
           </UnorderedList>
         </ItemsRight>
       </Items>

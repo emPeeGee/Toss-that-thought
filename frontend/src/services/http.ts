@@ -1,13 +1,16 @@
 // To make a config file
 const testUrl = 'http://localhost:9000/api/';
+const authUrl = 'http://localhost:9000/auth/';
 
 interface GetRequest {
-  url?: string;
+  url: string;
+  token?: string | null;
 }
 
 interface PostRequest<T> {
-  url?: string;
+  url: string;
   body?: T;
+  auth?: boolean;
 }
 
 async function handleErrors<T>(response: Response): Promise<T> {
@@ -21,16 +24,17 @@ async function handleErrors<T>(response: Response): Promise<T> {
 
 // TODO: To check if this approach is good
 export const api = {
-  get: <K>({ url }: GetRequest) =>
+  get: <K>({ url, token }: GetRequest) =>
     fetch(`${testUrl}${url}`, {
       method: 'GET',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        Authorization: `${token ? `Bearer ${token}` : ''}`
       }
     }).then((response) => handleErrors<K>(response)),
 
-  post: <T, K>({ url, body }: PostRequest<T>) =>
-    fetch(`${testUrl}${url}`, {
+  post: <T, K>({ url, body, auth = false }: PostRequest<T>) =>
+    fetch(`${auth ? authUrl : testUrl}${url}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

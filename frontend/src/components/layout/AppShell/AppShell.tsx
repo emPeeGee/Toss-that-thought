@@ -8,7 +8,7 @@ type Props = {
 const useStyles = createStyles(() => ({
   shell: {
     width: '100%',
-    height: '100vh',
+    minHeight: '100vh',
     padding: 0,
     margin: 0,
     display: 'flex',
