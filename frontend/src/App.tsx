@@ -1,8 +1,9 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import { ColorScheme, ColorSchemeProvider, MantineProvider } from '@mantine/core';
+import { BrowserRouter, Route, Routes, Outlet, Navigate } from 'react-router-dom';
+import { ColorScheme, ColorSchemeProvider, MantineProvider, Title } from '@mantine/core';
 import { Header } from 'components/layout/Header/Header';
 import { GlobalStyles } from 'assets/styles/globalStyles';
+// TODO, create index for component
 import { Footer } from 'components/layout/Footer/Footer';
 import { AppShell } from 'components/layout/AppShell/AppShell';
 import { ThoughtMetadata, ThoughtCreate, ThoughtBurn, ThoughtView } from 'features/thoughts';
@@ -11,12 +12,33 @@ import { NotificationsProvider, showNotification } from '@mantine/notifications'
 import { useNetworkStatus } from 'hooks/use-network-status';
 import { Offline } from 'components/Offline/Offline';
 import { DateUnit } from 'utils/date';
+// TODO: index
 import { SignIn } from 'features/authentication/SignIn/SignIn';
 import { Profile } from 'features/authentication/Profile/Profile';
 import { UserContext } from 'features/authentication/user.context';
 import { api } from 'services/http';
-import { useToken } from 'hooks/useToken';
 import { UserModel } from 'features/authentication/authentication.model';
+import { tokenIdentifier } from './features/authentication/constants';
+
+interface ProtectedRouteProps {
+  isAllowed: boolean;
+  redirectPath?: string;
+  children?: any;
+}
+
+// TODO: To be relocated
+function ProtectedRoute({ isAllowed, redirectPath = '/', children }: ProtectedRouteProps) {
+  if (!isAllowed) {
+    return <Navigate to={redirectPath} replace />;
+  }
+
+  return children || <Outlet />;
+}
+
+ProtectedRoute.defaultProps = {
+  redirectPath: '/',
+  children: undefined
+};
 
 function App() {
   const [colorScheme, setColorScheme] = useState<ColorScheme>('light');
@@ -26,9 +48,11 @@ function App() {
   const { isOnline } = useNetworkStatus();
   const isFirstRun = useRef(true);
   const [user, setUser] = useState<UserModel | null>(null);
-  const value = useMemo(() => ({ user, setUser }), [user]);
-  const { token } = useToken();
-  // Token is not updated when in changes so need to do something.https://stackoverflow.com/questions/65117661/custom-hook-not-triggering-in-component
+  const [token, setToken] = useState<string | null>(localStorage.getItem(tokenIdentifier));
+  const value = useMemo(() => ({ user, setUser, token, setToken }), [user, token]);
+
+  // TODO: is used to prepare user
+  const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
     if (isFirstRun.current) {
@@ -46,10 +70,9 @@ function App() {
     });
   }, [isOnline]);
 
-  console.log('App', token);
-
   useEffect(() => {
     console.log('Token', token);
+    // TODO: set token in localstorage
 
     if ((token ?? '').length > 0) {
       api
@@ -58,13 +81,19 @@ function App() {
           token
         })
         .then((response) => {
-          console.log(response);
           setUser(response);
         })
         .catch((err) => {
           console.log(err);
           setUser(null);
+          setToken(null);
+          localStorage.removeItem(tokenIdentifier);
+        })
+        .finally(() => {
+          setIsReady(true);
         });
+    } else {
+      setIsReady(true);
     }
   }, [token]);
 
@@ -110,23 +139,28 @@ function App() {
           <BrowserRouter>
             <GlobalStyles />
             <UserContext.Provider value={value}>
-              <AppShell>
-                <Header />
-                {!isOnline ? (
-                  <Offline />
-                ) : (
-                  <Routes>
-                    <Route path="/" element={<ThoughtCreate />} />
-                    <Route path="/profile" element={<Profile />} />
-                    <Route path="/sign-in" element={<SignIn />} />
-                    <Route path="/metadata/:metadataKey" element={<ThoughtMetadata />} />
-                    <Route path="/thought/:thoughtKey" element={<ThoughtView />} />
-                    <Route path="/thought/:metadataKey/burn" element={<ThoughtBurn />} />
-                    <Route path="*" element={<NotFound />} />
-                  </Routes>
-                )}
-                <Footer />
-              </AppShell>
+              {isReady && (
+                <AppShell>
+                  <Header />
+                  {!isOnline ? (
+                    <Offline />
+                  ) : (
+                    <Routes>
+                      <Route path="/" element={<ThoughtCreate />} />
+                      <Route path="/sign-in" element={<SignIn />} />
+                      <Route path="/metadata/:metadataKey" element={<ThoughtMetadata />} />
+                      <Route path="/thought/:thoughtKey" element={<ThoughtView />} />
+                      <Route path="/thought/:metadataKey/burn" element={<ThoughtBurn />} />
+                      <Route element={<ProtectedRoute isAllowed={!!user} />}>
+                        <Route path="/profile" element={<Profile />} />
+                        <Route path="/profile/recent" element={<Title>Recent</Title>} />
+                      </Route>
+                      <Route path="*" element={<NotFound />} />
+                    </Routes>
+                  )}
+                  <Footer />
+                </AppShell>
+              )}
             </UserContext.Provider>
           </BrowserRouter>
         </NotificationsProvider>

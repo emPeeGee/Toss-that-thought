@@ -4,7 +4,6 @@ import { ActionIcon, Text, useMantineColorScheme } from '@mantine/core';
 
 import { UserContext } from 'features/authentication/user.context';
 import { Anchor } from 'components/navigation/Anchor/Anchor';
-import { useToken } from 'hooks/useToken';
 import logo from 'assets/logo.svg';
 import {
   IconGroup,
@@ -15,12 +14,12 @@ import {
   UnorderedList,
   Wrapper
 } from './Header.styles';
+import { tokenIdentifier } from '../../../features/authentication/constants';
 
 export function Header() {
   const { colorScheme, toggleColorScheme } = useMantineColorScheme();
   const [isDark, setIsDark] = useState(false);
   const userContext = useContext(UserContext);
-  const { setToken } = useToken();
 
   useEffect(() => {
     setIsDark(colorScheme === 'dark');
@@ -28,8 +27,9 @@ export function Header() {
 
   const logout = () => {
     console.log('Logout');
-    setToken('');
     userContext?.setUser(null);
+    userContext?.setToken(null);
+    localStorage.removeItem(tokenIdentifier);
   };
 
   return (

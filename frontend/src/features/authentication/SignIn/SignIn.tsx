@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { Button, Container, LoadingOverlay, PasswordInput, TextInput, Title } from '@mantine/core';
 import { ArrowBackUp, Bolt, Lock, UserCircle } from 'tabler-icons-react';
 import { Link, useNavigate } from 'react-router-dom';
@@ -8,7 +8,8 @@ import {
   CredentialsModel
 } from 'features/authentication/authentication.model';
 import { api } from 'services/http';
-import { useToken } from 'hooks/useToken';
+import { UserContext } from '../user.context';
+import { tokenIdentifier } from '../constants';
 
 export function SignIn() {
   const {
@@ -20,12 +21,8 @@ export function SignIn() {
   });
 
   const navigate = useNavigate();
-  const { token, setToken } = useToken();
   const [isLoading, setIsLoading] = useState(false);
-
-  if (token) {
-    console.log(token, ' you are authenticated');
-  }
+  const userContext = useContext(UserContext);
 
   const signIn = (data: CredentialsModel) => {
     setIsLoading(true);
@@ -36,8 +33,8 @@ export function SignIn() {
         auth: true
       })
       .then((response) => {
-        console.log(response);
-        setToken(response.token);
+        localStorage.setItem(tokenIdentifier, response.token);
+        userContext?.setToken(response.token);
 
         navigate(`/profile/`, {
           replace: true
