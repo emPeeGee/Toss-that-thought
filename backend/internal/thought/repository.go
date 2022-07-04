@@ -9,7 +9,7 @@ import (
 )
 
 type Repository interface {
-	Create(input CreateDTO) (CreateResponse, error)
+	Create(input CreateDTO, userId *uint) (CreateResponse, error)
 	RetrieveMetadata(metadataKey string) (MetadataResponse, error)
 	RetrieveThoughtByPassphrase(thoughtKey, passphrase string) (ViewThoughtResponse, error)
 	RetrieveThoughtValidity(thoughtKey string) (ValidityInformation, error)
@@ -29,11 +29,13 @@ func NewRepository(db *gorm.DB, logger log.Logger) *repository {
 	return &repository{db: db, logger: logger}
 }
 
-func (r *repository) Create(input CreateDTO) (CreateResponse, error) {
+func (r *repository) Create(input CreateDTO, userId *uint) (CreateResponse, error) {
+	r.logger.Debug(userId, "  ", &userId, " User ID")
 	thought := entity.Thought{
 		Thought:    input.Thought,
 		Passphrase: input.Passphrase,
 		Lifetime:   input.Lifetime,
+		UserID:     userId,
 	}
 
 	if err := r.db.Create(&thought).Error; err != nil {

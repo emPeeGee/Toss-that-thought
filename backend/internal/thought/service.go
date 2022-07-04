@@ -8,7 +8,7 @@ import (
 )
 
 type Service interface {
-	Create(input CreateDTO) (CreateResponse, error)
+	Create(input CreateDTO, userId *uint) (CreateResponse, error)
 	RetrieveMetadata(metadataKey string) (MetadataResponse, error)
 	RetrieveThoughtByPassphrase(thoughtKey, passphrase string) (ViewThoughtResponse, error)
 	RetrieveThoughtPassphraseInfo(thoughtKey string) (PassphraseInformationResponse, error)
@@ -26,7 +26,7 @@ func NewThoughtService(repo Repository, logger log.Logger) *service {
 	return &service{repo: repo, logger: logger}
 }
 
-func (s *service) Create(input CreateDTO) (CreateResponse, error) {
+func (s *service) Create(input CreateDTO, userId *uint) (CreateResponse, error) {
 	if len(input.Passphrase) != 0 {
 		hashedPassphrase, err := crypt.HashPassphrase(input.Passphrase)
 		if err != nil {
@@ -35,7 +35,7 @@ func (s *service) Create(input CreateDTO) (CreateResponse, error) {
 		input.Passphrase = hashedPassphrase
 	}
 
-	createdThought, err := s.repo.Create(input)
+	createdThought, err := s.repo.Create(input, userId)
 	if err == nil {
 		createdThought.AbbreviatedThoughtKey = createdThought.ThoughtKey.String()[:6]
 	}

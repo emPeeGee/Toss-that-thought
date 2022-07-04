@@ -17,4 +17,5 @@ type Thought struct {
 	CreatedDate time.Time  `json:"createdDate" gorm:"autoCreateTime;notNull"`
 	MetadataKey uuid.UUID  `json:"metadataKey" gorm:"notNull;type:uuid;default:uuid_generate_v4()"`
 	ThoughtKey  uuid.UUID  `json:"thoughtKey" gorm:"notNull;type:uuid;default:uuid_generate_v4()"`
+	UserID      *uint
 }

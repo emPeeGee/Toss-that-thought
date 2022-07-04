@@ -29,17 +29,17 @@ func ParseToken(accessToken string) (uint, error) {
 }
 
 // TODO: to be added associations and checking jwt
-
-func GetUserId(c *gin.Context) (uint, error) {
+// 4 July, what did I mean withch checking jwt?
+func GetUserId(c *gin.Context) (*uint, error) {
 	id, ok := c.Get(userCtx)
 	if !ok {
-		return 0, errors.New("user id not found")
+		return nil, nil
 	}
 
 	idInt, ok := id.(uint)
 	if !ok {
-		return 0, errors.New("user id is of invalid type")
+		return nil, errors.New("user id is of invalid type")
 	}
 
-	return idInt, nil
+	return &idInt, nil
 }

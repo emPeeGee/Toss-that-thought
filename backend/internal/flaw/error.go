@@ -31,7 +31,6 @@ func NotFound(c *gin.Context, message, details string) {
 	c.AbortWithError(http.StatusNotFound, ErrorResponse{Status: http.StatusNotFound, Message: message, Details: details})
 }
 
-// TODO: For future
 func Unauthorized(c *gin.Context, message, details string) {
 	c.AbortWithError(http.StatusUnauthorized, ErrorResponse{Status: http.StatusUnauthorized, Message: message, Details: details})
 }

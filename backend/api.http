@@ -1,7 +1,22 @@
-### Valid Create request
+### Valid Create request logged
 POST http://localhost:9000/api/create
 Content-Type: application/json
 Authorization: Bearer {{token}}
+
+{
+  "thought": "Hello, Cousin, v{{$randomInt}}",
+  "passphrase": "1121",
+  "lifetime": "2006-01-02T15:04:05Z"
+}
+
+> {%
+  client.global.set("metadataKey", response.body.metadataKey)
+  client.global.set("thoughtKey", response.body.thoughtKey)
+ %}
+
+### Valid Create request unauthenticated
+POST http://localhost:9000/api/create
+Content-Type: application/json
 
 {
   "thought": "Hello, Cousin, v{{$randomInt}}",
@@ -19,7 +34,7 @@ POST http://localhost:9000/api/create
 Content-Type: application/json
 
 {
-  "thought": "Hey",
+  "thought": "",
   "passphrase": "",
   "lifetime": "2006-01-02T15:04:05Z"
 }

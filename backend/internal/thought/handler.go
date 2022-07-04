@@ -33,12 +33,17 @@ type handler struct {
 func (h *handler) create(c *gin.Context) {
 	var input CreateDTO
 
-	// TODO: handle authenticated users
 	userId, err := auth.GetUserId(c)
 	if err != nil {
-		h.logger.Debug(err.Error(), "Not authenticated")
+		flaw.InternalServer(c, err.Error(), "")
+		return
+	}
+
+	// TODO: DEBUG purpose
+	if userId != nil {
+		h.logger.Debug("%s => %s", "Authenticated", userId)
 	} else {
-		h.logger.Debug(userId, "Authenticated")
+		h.logger.Debug("%s", "Not authenticated")
 	}
 
 	if err := c.BindJSON(&input); err != nil {
@@ -58,7 +63,7 @@ func (h *handler) create(c *gin.Context) {
 		return
 	}
 
-	createdThought, err := h.service.Create(input)
+	createdThought, err := h.service.Create(input, userId)
 	if err != nil {
 		flaw.InternalServer(c, "something went wrong, we are working", err.Error())
 		return
@@ -121,7 +126,7 @@ func (h *handler) retrieveThought(c *gin.Context) {
 	c.JSON(http.StatusOK, thoughtResponse)
 }
 
-// Dublicated code with checking thought if exists
+// Duplicated code with checking thought if exists
 func (h *handler) burnThought(c *gin.Context) {
 	metadataKey := c.Param("id")
 
