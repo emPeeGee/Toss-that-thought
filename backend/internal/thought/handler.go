@@ -174,3 +174,5 @@ func (h *handler) getThoughtsMetadataByUser(c *gin.Context) {
 
 	c.JSON(http.StatusOK, thoughtsMetadata)
 }
+
+// TODO: validate min date of lifetime

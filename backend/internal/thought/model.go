@@ -39,6 +39,7 @@ type PassphraseInformationResponse struct {
 }
 
 type MetadataResponse struct {
+	MetadataKey           uuid.UUID  `json:"metadataKey" `
 	Lifetime              time.Time  `json:"lifetime"`
 	AbbreviatedThoughtKey string     `json:"abbreviatedThoughtKey" gorm:"column:thought_key"`
 	IsBurned              bool       `json:"isBurned"`
