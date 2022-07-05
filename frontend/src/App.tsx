@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { BrowserRouter, Route, Routes, Outlet, Navigate } from 'react-router-dom';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { ColorScheme, ColorSchemeProvider, MantineProvider, Title } from '@mantine/core';
 import { Header } from 'components/layout/Header/Header';
 import { GlobalStyles } from 'assets/styles/globalStyles';
@@ -8,6 +8,7 @@ import { Footer } from 'components/layout/Footer/Footer';
 import { AppShell } from 'components/layout/AppShell/AppShell';
 import { ThoughtMetadata, ThoughtCreate, ThoughtBurn, ThoughtView } from 'features/thoughts';
 import { NotFound } from 'components/layout/NotFound/NotFound';
+import { api } from 'services/http';
 import { NotificationsProvider, showNotification } from '@mantine/notifications';
 import { useNetworkStatus } from 'hooks/use-network-status';
 import { Offline } from 'components/Offline/Offline';
@@ -16,29 +17,9 @@ import { DateUnit } from 'utils/date';
 import { SignIn } from 'features/authentication/SignIn/SignIn';
 import { Profile } from 'features/authentication/Profile/Profile';
 import { UserContext } from 'features/authentication/user.context';
-import { api } from 'services/http';
 import { UserModel } from 'features/authentication/authentication.model';
-import { tokenIdentifier } from './features/authentication/constants';
-
-interface ProtectedRouteProps {
-  isAllowed: boolean;
-  redirectPath?: string;
-  children?: any;
-}
-
-// TODO: To be relocated
-function ProtectedRoute({ isAllowed, redirectPath = '/', children }: ProtectedRouteProps) {
-  if (!isAllowed) {
-    return <Navigate to={redirectPath} replace />;
-  }
-
-  return children || <Outlet />;
-}
-
-ProtectedRoute.defaultProps = {
-  redirectPath: '/',
-  children: undefined
-};
+import { tokenIdentifier } from 'features/authentication/constants';
+import { ProtectedRoute } from 'components/ProtectedRoute/ProtectedRoute';
 
 function App() {
   const [colorScheme, setColorScheme] = useState<ColorScheme>('light');
@@ -50,9 +31,24 @@ function App() {
   const [user, setUser] = useState<UserModel | null>(null);
   const [token, setToken] = useState<string | null>(localStorage.getItem(tokenIdentifier));
   const value = useMemo(() => ({ user, setUser, token, setToken }), [user, token]);
-
+  const [isLogged, setIsLogged] = useState(false);
   // TODO: is used to prepare user
-  const [isReady, setIsReady] = useState(false);
+  const [isAppReady, setIsAppReady] = useState(false);
+
+  const logout = () => {
+    setUser(null);
+    setToken(null);
+    // TODO: set token in localstorage
+    localStorage.removeItem(tokenIdentifier);
+    setIsAppReady(true);
+  };
+
+  useEffect(() => {
+    if (user) {
+      setIsLogged(!!user);
+      setIsAppReady(true);
+    }
+  }, [user]);
 
   useEffect(() => {
     if (isFirstRun.current) {
@@ -71,8 +67,7 @@ function App() {
   }, [isOnline]);
 
   useEffect(() => {
-    console.log('Token', token);
-    // TODO: set token in localstorage
+    setIsAppReady(false);
 
     if ((token ?? '').length > 0) {
       api
@@ -80,20 +75,10 @@ function App() {
           url: `user`,
           token
         })
-        .then((response) => {
-          setUser(response);
-        })
-        .catch((err) => {
-          console.log(err);
-          setUser(null);
-          setToken(null);
-          localStorage.removeItem(tokenIdentifier);
-        })
-        .finally(() => {
-          setIsReady(true);
-        });
+        .then((response) => setUser(response))
+        .catch(() => logout());
     } else {
-      setIsReady(true);
+      setIsAppReady(true);
     }
   }, [token]);
 
@@ -139,7 +124,7 @@ function App() {
           <BrowserRouter>
             <GlobalStyles />
             <UserContext.Provider value={value}>
-              {isReady && (
+              {isAppReady && (
                 <AppShell>
                   <Header />
                   {!isOnline ? (
@@ -151,7 +136,7 @@ function App() {
                       <Route path="/metadata/:metadataKey" element={<ThoughtMetadata />} />
                       <Route path="/thought/:thoughtKey" element={<ThoughtView />} />
                       <Route path="/thought/:metadataKey/burn" element={<ThoughtBurn />} />
-                      <Route element={<ProtectedRoute isAllowed={!!user} />}>
+                      <Route element={<ProtectedRoute isAllowed={isLogged} />}>
                         <Route path="/profile" element={<Profile />} />
                         <Route path="/profile/recent" element={<Title>Recent</Title>} />
                       </Route>

@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Button, Container, LoadingOverlay, PasswordInput, TextInput, Title } from '@mantine/core';
 import { ArrowBackUp, Bolt, Lock, UserCircle } from 'tabler-icons-react';
 import { Link, useNavigate } from 'react-router-dom';
@@ -24,6 +24,14 @@ export function SignIn() {
   const [isLoading, setIsLoading] = useState(false);
   const userContext = useContext(UserContext);
 
+  useEffect(() => {
+    if (userContext?.user) {
+      navigate(`/profile/`, {
+        replace: true
+      });
+    }
+  }, [userContext?.user]);
+
   const signIn = (data: CredentialsModel) => {
     setIsLoading(true);
     api
@@ -35,10 +43,6 @@ export function SignIn() {
       .then((response) => {
         localStorage.setItem(tokenIdentifier, response.token);
         userContext?.setToken(response.token);
-
-        navigate(`/profile/`, {
-          replace: true
-        });
       })
       .catch((err) => {
         console.log(err);

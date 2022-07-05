@@ -3,6 +3,7 @@ import { MoonStars, Sun } from 'tabler-icons-react';
 import { ActionIcon, Text, useMantineColorScheme } from '@mantine/core';
 
 import { UserContext } from 'features/authentication/user.context';
+import { tokenIdentifier } from 'features/authentication/constants';
 import { Anchor } from 'components/navigation/Anchor/Anchor';
 import logo from 'assets/logo.svg';
 import {
@@ -14,7 +15,6 @@ import {
   UnorderedList,
   Wrapper
 } from './Header.styles';
-import { tokenIdentifier } from '../../../features/authentication/constants';
 
 export function Header() {
   const { colorScheme, toggleColorScheme } = useMantineColorScheme();
