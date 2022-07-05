@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import {
   Container,
   Textarea,
@@ -17,6 +17,7 @@ import { SubmitHandler, useForm, Controller } from 'react-hook-form';
 import { api } from 'services/http';
 import { getCurrentDatePlus } from 'utils/date';
 import { ThoughtCreateRequest, ThoughtMetadataModel } from 'features/thoughts/thought.model';
+import { UserContext } from 'features/authentication';
 
 // Bad place and name
 interface SelectEntry {
@@ -53,11 +54,16 @@ export function ThoughtCreate() {
   const [isCreateAccountAlertVisible, setIsCreateAccountAlertVisible] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
+  const userContext = useContext(UserContext);
 
   const thoughtSubmit: SubmitHandler<ThoughtCreateRequest> = async (data) => {
     setIsLoading(true);
     api
-      .post<ThoughtCreateRequest, ThoughtMetadataModel>({ url: 'create', body: data })
+      .post<ThoughtCreateRequest, ThoughtMetadataModel>({
+        url: 'create',
+        body: data,
+        token: userContext?.token
+      })
       .then((response) => {
         navigate(`metadata/${response.metadataKey}`, {
           replace: true,

@@ -42,21 +42,23 @@ export function Header() {
         </IconGroup>
         <ItemsRight>
           <UnorderedList>
-            <ActionIcon
-              variant="outline"
-              color={isDark ? 'yellow' : 'blue'}
-              onClick={() => toggleColorScheme()}
-              title="Toggle color scheme">
-              {isDark ? <Sun size={18} /> : <MoonStars size={18} />}
-            </ActionIcon>
             <ListItem>
-              <Anchor to="about" title="About" />
+              <ActionIcon
+                variant="outline"
+                color={isDark ? 'yellow' : 'blue'}
+                onClick={() => toggleColorScheme()}
+                title="Toggle color scheme">
+                {isDark ? <Sun size={18} /> : <MoonStars size={18} />}
+              </ActionIcon>
             </ListItem>
 
             {userContext?.user ? (
               <>
                 <ListItem>
                   <Anchor to="profile" title={userContext?.user?.username ?? 'Profile'} />
+                </ListItem>
+                <ListItem>
+                  <Anchor to="profile/recent" title="Recent thoughts" />
                 </ListItem>
                 <ListItem onClick={() => logout()}>
                   <Anchor to="/" title="Log out" />

@@ -11,6 +11,7 @@ interface PostRequest<T> {
   url: string;
   body?: T;
   auth?: boolean;
+  token?: string | null;
 }
 
 async function handleErrors<T>(response: Response): Promise<T> {
@@ -33,11 +34,12 @@ export const api = {
       }
     }).then((response) => handleErrors<K>(response)),
 
-  post: <T, K>({ url, body, auth = false }: PostRequest<T>) =>
+  post: <T, K>({ url, body, token, auth = false }: PostRequest<T>) =>
     fetch(`${auth ? authUrl : testUrl}${url}`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        Authorization: `${token ? `Bearer ${token}` : ''}`
       },
       body: JSON.stringify(body)
     }).then((response) => handleErrors<K>(response))

@@ -8,6 +8,7 @@ export interface ThoughtMetadataModel {
   viewedDate?: string;
   isBurned: boolean;
   isViewed: boolean;
+  createdDate?: string;
 }
 
 export interface ThoughtCreateRequest {

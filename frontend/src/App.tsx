@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import { ColorScheme, ColorSchemeProvider, MantineProvider, Title } from '@mantine/core';
+import { ColorScheme, ColorSchemeProvider, MantineProvider } from '@mantine/core';
 import { GlobalStyles } from 'assets/styles/globalStyles';
 import { api } from 'services/http';
 import { NotificationsProvider, showNotification } from '@mantine/notifications';
@@ -9,6 +9,7 @@ import { DateUnit } from 'utils/date';
 import { AppShell, Footer, NotFound, ProtectedRoute, Offline, Header } from 'components';
 import { Profile, SignIn, tokenIdentifier, UserModel, UserContext } from 'features/authentication';
 import { ThoughtMetadata, ThoughtCreate, ThoughtBurn, ThoughtView } from 'features/thoughts';
+import { RecentThoughts } from 'features/thoughts/RecentThoughts/RecentThoughts';
 
 function App() {
   const [colorScheme, setColorScheme] = useState<ColorScheme>('light');
@@ -127,7 +128,7 @@ function App() {
                       <Route path="/thought/:metadataKey/burn" element={<ThoughtBurn />} />
                       <Route element={<ProtectedRoute isAllowed={isLogged} />}>
                         <Route path="/profile" element={<Profile />} />
-                        <Route path="/profile/recent" element={<Title>Recent</Title>} />
+                        <Route path="/profile/recent" element={<RecentThoughts />} />
                       </Route>
                       <Route path="*" element={<NotFound />} />
                     </Routes>
