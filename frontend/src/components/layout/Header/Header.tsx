@@ -2,9 +2,8 @@ import React, { useContext, useEffect, useState } from 'react';
 import { MoonStars, Sun } from 'tabler-icons-react';
 import { ActionIcon, Text, useMantineColorScheme } from '@mantine/core';
 
-import { UserContext } from 'features/authentication/user.context';
-import { tokenIdentifier } from 'features/authentication/constants';
-import { Anchor } from 'components/navigation/Anchor/Anchor';
+import { UserContext, tokenIdentifier } from 'features/authentication/';
+import { Anchor } from 'components';
 import logo from 'assets/logo.svg';
 import {
   IconGroup,

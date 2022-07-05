@@ -5,11 +5,11 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import {
   AuthenticationResponse,
-  CredentialsModel
-} from 'features/authentication/authentication.model';
+  CredentialsModel,
+  UserContext,
+  tokenIdentifier
+} from 'features/authentication';
 import { api } from 'services/http';
-import { UserContext } from '../user.context';
-import { tokenIdentifier } from '../constants';
 
 export function SignIn() {
   const {

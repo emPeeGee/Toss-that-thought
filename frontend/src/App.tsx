@@ -1,25 +1,14 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { ColorScheme, ColorSchemeProvider, MantineProvider, Title } from '@mantine/core';
-import { Header } from 'components/layout/Header/Header';
 import { GlobalStyles } from 'assets/styles/globalStyles';
-// TODO, create index for component
-import { Footer } from 'components/layout/Footer/Footer';
-import { AppShell } from 'components/layout/AppShell/AppShell';
-import { ThoughtMetadata, ThoughtCreate, ThoughtBurn, ThoughtView } from 'features/thoughts';
-import { NotFound } from 'components/layout/NotFound/NotFound';
 import { api } from 'services/http';
 import { NotificationsProvider, showNotification } from '@mantine/notifications';
 import { useNetworkStatus } from 'hooks/use-network-status';
-import { Offline } from 'components/Offline/Offline';
 import { DateUnit } from 'utils/date';
-// TODO: index
-import { SignIn } from 'features/authentication/SignIn/SignIn';
-import { Profile } from 'features/authentication/Profile/Profile';
-import { UserContext } from 'features/authentication/user.context';
-import { UserModel } from 'features/authentication/authentication.model';
-import { tokenIdentifier } from 'features/authentication/constants';
-import { ProtectedRoute } from 'components/ProtectedRoute/ProtectedRoute';
+import { AppShell, Footer, NotFound, ProtectedRoute, Offline, Header } from 'components';
+import { Profile, SignIn, tokenIdentifier, UserModel, UserContext } from 'features/authentication';
+import { ThoughtMetadata, ThoughtCreate, ThoughtBurn, ThoughtView } from 'features/thoughts';
 
 function App() {
   const [colorScheme, setColorScheme] = useState<ColorScheme>('light');
