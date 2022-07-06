@@ -3,15 +3,11 @@ package auth
 import (
 	"encoding/json"
 	"errors"
+	"github.com/emPeeee/ttt/internal/config"
 	"github.com/emPeeee/ttt/pkg/crypt"
 	"github.com/emPeeee/ttt/pkg/log"
 	"github.com/golang-jwt/jwt/v4"
 	"time"
-)
-
-const (
-	signingKey = "bv646gf930ds^#fg&)Fd_)))*("
-	tokenTTL   = time.Hour * 12
 )
 
 type Service interface {
@@ -22,6 +18,7 @@ type Service interface {
 
 type service struct {
 	repo   Repository
+	cfg    *config.Auth
 	logger log.Logger
 }
 
@@ -30,20 +27,17 @@ type tokenClaims struct {
 	UserId uint `json:"userId"`
 }
 
-func NewAuthService(repository Repository, logger log.Logger) *service {
-	return &service{repo: repository, logger: logger}
+func NewAuthService(repository Repository, cfg *config.Auth, logger log.Logger) *service {
+	return &service{repo: repository, cfg: cfg, logger: logger}
 }
 
 func (s *service) createUser(user createUserDTO) error {
-	// TODO crypt
 	hashedPassword, err := crypt.HashPassphrase(user.Password)
 	if err != nil {
 		return err
 	}
 
 	user.Password = hashedPassword
-
-	s.logger.Debug(user)
 
 	err = s.repo.createUser(user)
 	if err != nil {
@@ -73,16 +67,15 @@ func (s *service) generateToken(credentials credentialsDTO) (string, error) {
 	str, _ := json.MarshalIndent(user, "", "\t")
 	s.logger.Debug(string(str))
 
-	// TODO: constants to be moved in config
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &tokenClaims{
 		jwt.StandardClaims{
-			ExpiresAt: time.Now().Add(tokenTTL).Unix(),
+			ExpiresAt: time.Now().Add(s.cfg.TokenTTL).Unix(),
 			IssuedAt:  time.Now().Unix(),
 		},
 		user.ID,
 	})
 
-	return token.SignedString([]byte(signingKey))
+	return token.SignedString([]byte(s.cfg.SigningKey))
 }
 
 func (s *service) getUserById(id uint) (UserResponse, error) {

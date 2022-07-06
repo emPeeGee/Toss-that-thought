@@ -6,7 +6,7 @@ import (
 	"github.com/golang-jwt/jwt/v4"
 )
 
-func ParseToken(accessToken string) (uint, error) {
+func ParseToken(signingKey, accessToken string) (uint, error) {
 	token, err := jwt.ParseWithClaims(accessToken, &tokenClaims{}, func(token *jwt.Token) (interface{}, error) {
 
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
@@ -28,8 +28,6 @@ func ParseToken(accessToken string) (uint, error) {
 	return claims.UserId, nil
 }
 
-// TODO: to be added associations and checking jwt
-// 4 July, what did I mean withch checking jwt?
 func GetUserId(c *gin.Context) (*uint, error) {
 	id, ok := c.Get(userCtx)
 	if !ok {

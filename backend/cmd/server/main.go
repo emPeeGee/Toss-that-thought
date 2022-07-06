@@ -23,8 +23,6 @@ import (
 
 const Version = "1.0.0"
 
-// TODO: jwt config to be extracted
-
 // RUN: Before autoMigrate -> CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 func main() {
 	logger := log.New().With(nil, "version", Version)
@@ -52,7 +50,7 @@ func main() {
 	valid := validator.New()
 
 	go func() {
-		if err := server.Run(cfg.Server, buildHandler(db, valid, logger)); err != nil {
+		if err := server.Run(cfg.Server, buildHandler(db, valid, &cfg.Auth, logger)); err != nil {
 			logger.Fatalf("Error occurred while running http server: %s", err.Error())
 		}
 	}()
@@ -71,17 +69,17 @@ func main() {
 }
 
 // buildHandler sets up the HTTP routing and builds an HTTP handler.
-func buildHandler(db *gorm.DB, valid *validator.Validate, logger log.Logger) http.Handler {
+func buildHandler(db *gorm.DB, valid *validator.Validate, authConfig *config.Auth, logger log.Logger) http.Handler {
 	router := gin.New()
 	router.Use(accesslog.Handler(logger), flaw.Handler(logger), cors.Handler())
 
 	authRg := router.Group("/auth")
-	apiRg := router.Group("/api", auth.HandleUserIdentity(logger))
+	apiRg := router.Group("/api", auth.HandleUserIdentity(authConfig, logger))
 
 	auth.RegisterHandlers(
 		authRg,
 		apiRg,
-		auth.NewAuthService(auth.NewAuthRepository(db, logger), logger),
+		auth.NewAuthService(auth.NewAuthRepository(db, logger), authConfig, logger),
 		valid,
 		logger,
 	)

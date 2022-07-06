@@ -39,7 +39,6 @@ func (r *repository) createUser(user createUserDTO) error {
 
 func (r *repository) getUserByUsername(username string) (entity.User, error) {
 	var user entity.User
-	// TODO if First if first when where does not have effect
 
 	if err := r.db.Where("username = ?", username).First(&user).Error; err != nil {
 		return entity.User{}, err

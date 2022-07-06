@@ -14,11 +14,13 @@ const (
 	defaultWriteTimeout   = 10 * time.Second
 	path                  = "configs"
 	fileName              = "config"
+	tokenTTL              = time.Hour * 12
 )
 
 type Config struct {
 	Server
 	DB
+	Auth
 }
 
 type Server struct {
@@ -35,6 +37,11 @@ type DB struct {
 	Password string
 	DBName   string
 	SSLMode  string
+}
+
+type Auth struct {
+	SigningKey string
+	TokenTTL   time.Duration
 }
 
 func Get(logger log.Logger) (*Config, error) {
@@ -64,7 +71,12 @@ func Get(logger log.Logger) (*Config, error) {
 		WriteTimeout:   defaultWriteTimeout,
 	}
 
-	return &Config{server, db}, nil
+	auth := Auth{
+		SigningKey: viper.GetString("auth.signingKey"),
+		TokenTTL:   tokenTTL,
+	}
+
+	return &Config{server, db, auth}, nil
 
 }
 

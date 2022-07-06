@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"github.com/emPeeee/ttt/internal/config"
 	"github.com/emPeeee/ttt/internal/flaw"
 	"github.com/emPeeee/ttt/pkg/log"
 	"github.com/gin-gonic/gin"
@@ -12,7 +13,7 @@ const (
 	userCtx             = "userId"
 )
 
-func HandleUserIdentity(logger log.Logger) gin.HandlerFunc {
+func HandleUserIdentity(cfg *config.Auth, logger log.Logger) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		header := c.GetHeader(authorizationHeader)
 		if header == "" {
@@ -32,7 +33,7 @@ func HandleUserIdentity(logger log.Logger) gin.HandlerFunc {
 			return
 		}
 
-		userId, err := ParseToken(headerParts[1])
+		userId, err := ParseToken(cfg.SigningKey, headerParts[1])
 		if err != nil {
 			flaw.Unauthorized(c, "", err.Error())
 			return

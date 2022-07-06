@@ -7,3 +7,6 @@ db:
   port: "5436"
   dbname: "ttt"
   sslmode: "disable"
+
+auth:
+  signingKey: "bv646gf930ds^#fg&)Fd_)))*("
