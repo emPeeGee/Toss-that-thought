@@ -13,10 +13,6 @@ type credentialsDTO struct {
 	Username string `json:"username" validate:"required,min=3,max=64"`
 }
 
-type userHashedPassword struct {
-	Password string
-}
-
 type UserResponse struct {
 	Username  string    `json:"username"`
 	Name      string    `json:"name"`

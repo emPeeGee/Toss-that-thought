@@ -2,6 +2,7 @@ package thought
 
 import (
 	"errors"
+	"github.com/emPeeee/ttt/internal/entity"
 	"github.com/emPeeee/ttt/pkg/crypt"
 	"github.com/emPeeee/ttt/pkg/log"
 	"time"
@@ -28,15 +29,21 @@ func NewThoughtService(repo Repository, logger log.Logger) *service {
 }
 
 func (s *service) Create(input CreateDTO, userId *uint) (CreateResponse, error) {
+	thought := entity.Thought{
+		Thought:  input.Thought,
+		Lifetime: input.Lifetime,
+		UserID:   userId,
+	}
+
+	// If passphrase is empty, when omit hashing
 	if len(input.Passphrase) != 0 {
-		hashedPassphrase, err := crypt.HashPassphrase(input.Passphrase)
+		err := thought.HashPassphrase(input.Passphrase)
 		if err != nil {
 			return CreateResponse{}, err
 		}
-		input.Passphrase = hashedPassphrase
 	}
 
-	createdThought, err := s.repo.Create(input, userId)
+	createdThought, err := s.repo.Create(thought)
 	if err == nil {
 		createdThought.AbbreviatedThoughtKey = createdThought.ThoughtKey.String()[:6]
 	}
@@ -99,7 +106,7 @@ func (s *service) RetrieveThoughtByPassphrase(thoughtKey, passphrase string) (Vi
 		return ViewThoughtResponse{}, err
 	}
 
-	if len(hashedPassphrase) != 0 && crypt.CheckPasswordHashes(passphrase, hashedPassphrase) == false {
+	if len(hashedPassphrase) != 0 && crypt.CheckPasswordHashes(passphrase, hashedPassphrase) != nil {
 		return ViewThoughtResponse{}, errors.New("password does not match")
 	}
 
@@ -142,7 +149,7 @@ func (s *service) BurnThought(metadataKey, passphrase string) error {
 		return err
 	}
 
-	if len(hashedPassphrase) != 0 && crypt.CheckPasswordHashes(passphrase, hashedPassphrase) == false {
+	if len(hashedPassphrase) != 0 && crypt.CheckPasswordHashes(passphrase, hashedPassphrase) != nil {
 		return errors.New("password does not match")
 	}
 

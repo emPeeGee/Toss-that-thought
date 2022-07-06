@@ -7,10 +7,9 @@ import (
 )
 
 type Repository interface {
-	createUser(user createUserDTO) error
+	createUser(user entity.User) error
 	getUserById(id uint) (UserResponse, error)
 	getUserByUsername(username string) (entity.User, error)
-	getHashedPasswordByUsername(username string) (userHashedPassword, error)
 }
 
 type repository struct {
@@ -22,15 +21,8 @@ func NewAuthRepository(db *gorm.DB, logger log.Logger) *repository {
 	return &repository{db: db, logger: logger}
 }
 
-func (r *repository) createUser(user createUserDTO) error {
-	// maybe dto is not needed here?
-	newUser := entity.User{
-		Username: user.Username,
-		Password: user.Password,
-		Name:     user.Name,
-	}
-
-	if err := r.db.Create(&newUser).Error; err != nil {
+func (r *repository) createUser(user entity.User) error {
+	if err := r.db.Create(&user).Error; err != nil {
 		return err
 	}
 
@@ -45,16 +37,6 @@ func (r *repository) getUserByUsername(username string) (entity.User, error) {
 	}
 
 	return user, nil
-}
-
-func (r *repository) getHashedPasswordByUsername(username string) (userHashedPassword, error) {
-	var userPassword userHashedPassword
-
-	if err := r.db.Model(&entity.User{}).Where("username = ?", username).First(&userPassword).Error; err != nil {
-		return userHashedPassword{}, err
-	}
-
-	return userPassword, nil
 }
 
 func (r *repository) getUserById(id uint) (UserResponse, error) {

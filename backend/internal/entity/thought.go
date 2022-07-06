@@ -1,6 +1,7 @@
 package entity
 
 import (
+	"github.com/emPeeee/ttt/pkg/crypt"
 	"github.com/google/uuid"
 	"time"
 )
@@ -18,4 +19,14 @@ type Thought struct {
 	MetadataKey uuid.UUID  `json:"metadataKey" gorm:"notNull;type:uuid;default:uuid_generate_v4()"`
 	ThoughtKey  uuid.UUID  `json:"thoughtKey" gorm:"notNull;type:uuid;default:uuid_generate_v4()"`
 	UserID      *uint
+}
+
+func (t *Thought) HashPassphrase(passphrase string) error {
+	hashedPassphrase, err := crypt.HashPassphrase(passphrase)
+	if err != nil {
+		return err
+	}
+
+	t.Passphrase = hashedPassphrase
+	return nil
 }
