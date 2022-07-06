@@ -15,28 +15,8 @@ import { AlertCircle, MessageCircle2 } from 'tabler-icons-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { SubmitHandler, useForm, Controller } from 'react-hook-form';
 import { api } from 'services/http';
-import { getCurrentDatePlus } from 'utils/date';
-import { ThoughtCreateRequest, ThoughtMetadataModel } from 'features/thoughts/thought.model';
 import { UserContext } from 'features/authentication';
-
-// Bad place and name
-interface SelectEntry {
-  value: string;
-  label: string;
-}
-
-// Is it good place to store?
-const lifetimeOptions: SelectEntry[] = [
-  { value: getCurrentDatePlus(168).toISOString(), label: '7 days' },
-  { value: getCurrentDatePlus(72).toISOString(), label: '3 days' },
-  { value: getCurrentDatePlus(24).toISOString(), label: '1 days' },
-  { value: getCurrentDatePlus(12).toISOString(), label: '12 hours' },
-  { value: getCurrentDatePlus(4).toISOString(), label: '4 hours' },
-  { value: getCurrentDatePlus(1).toISOString(), label: '1 hour' },
-  { value: getCurrentDatePlus(0, 30).toISOString(), label: '30 minutes' },
-  { value: getCurrentDatePlus(0, 5).toISOString(), label: '5 minutes' },
-  { value: getCurrentDatePlus(0, 1).toISOString(), label: '1 minutes' }
-];
+import { ThoughtCreateRequest, lifetimeOptions, ThoughtMetadataModel } from 'features/thoughts';
 
 export function ThoughtCreate() {
   const navigate = useNavigate();
