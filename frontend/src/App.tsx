@@ -4,32 +4,36 @@ import { ColorScheme, ColorSchemeProvider, MantineProvider } from '@mantine/core
 import { GlobalStyles } from 'assets/styles/globalStyles';
 import { api } from 'services/http';
 import { NotificationsProvider, showNotification } from '@mantine/notifications';
-import { useNetworkStatus } from 'hooks/use-network-status';
-import { DateUnit } from 'utils/date';
 import { AppShell, Footer, NotFound, ProtectedRoute, Offline, Header } from 'components';
-import { Profile, SignIn, tokenIdentifier, UserModel, UserContext } from 'features/authentication';
-import { ThoughtMetadata, ThoughtCreate, ThoughtBurn, ThoughtView } from 'features/thoughts';
-import { RecentThoughts } from 'features/thoughts/RecentThoughts/RecentThoughts';
+import { Profile, SignIn, UserModel, UserContext } from 'features/authentication';
+import {
+  ThoughtMetadata,
+  ThoughtCreate,
+  ThoughtBurn,
+  ThoughtView,
+  RecentThoughts
+} from 'features/thoughts';
+import { useLocalStorage, useNetworkStatus } from 'hooks';
+import { TOKEN_STORAGE_KEY, COLOR_SCHEME_STORAGE_KEY, Theme, DateUnit } from 'utils';
 
 function App() {
-  const [colorScheme, setColorScheme] = useState<ColorScheme>('light');
-  const toggleColorScheme = (value?: ColorScheme) =>
-    setColorScheme(value || (colorScheme === 'dark' ? 'light' : 'dark'));
-
   const { isOnline } = useNetworkStatus();
+  const [token, setToken] = useLocalStorage(TOKEN_STORAGE_KEY, '');
+  const [colorScheme, setColorScheme] = useLocalStorage<ColorScheme>(
+    COLOR_SCHEME_STORAGE_KEY,
+    Theme.Light
+  );
+  const toggleColorScheme = (value?: ColorScheme) =>
+    setColorScheme(value || (colorScheme === Theme.Light ? Theme.Light : Theme.Dark));
   const isFirstRun = useRef(true);
   const [user, setUser] = useState<UserModel | null>(null);
-  const [token, setToken] = useState<string | null>(localStorage.getItem(tokenIdentifier));
-  const value = useMemo(() => ({ user, setUser, token, setToken }), [user, token]);
+  const userContextValue = useMemo(() => ({ user, setUser, token, setToken }), [user, token]);
   const [isLogged, setIsLogged] = useState(false);
-  // TODO: is used to prepare user
   const [isAppReady, setIsAppReady] = useState(false);
 
   const logout = () => {
     setUser(null);
     setToken(null);
-    // TODO: set token in localstorage
-    localStorage.removeItem(tokenIdentifier);
     setIsAppReady(true);
   };
 
@@ -113,7 +117,7 @@ function App() {
         <NotificationsProvider>
           <BrowserRouter>
             <GlobalStyles />
-            <UserContext.Provider value={value}>
+            <UserContext.Provider value={userContextValue}>
               {isAppReady && (
                 <AppShell>
                   <Header />

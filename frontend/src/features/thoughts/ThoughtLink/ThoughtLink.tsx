@@ -1,8 +1,7 @@
 import React from 'react';
 import { ActionIcon, Alert, Code, Grid, Paper, Text } from '@mantine/core';
-import { selectElement } from 'utils/select-element';
-import { copyTextToClipboard } from 'utils/copy-to-clipboard';
 import { showNotification } from '@mantine/notifications';
+import { selectElement, copyTextToClipboard } from 'utils';
 
 interface ThoughtLinkProps {
   link?: string;

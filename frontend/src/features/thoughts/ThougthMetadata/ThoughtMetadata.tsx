@@ -14,10 +14,9 @@ import {
 } from '@mantine/core';
 import { Link, useLocation, useParams } from 'react-router-dom';
 import { Bolt, MessageCircle2 } from 'tabler-icons-react';
-import { isObjectEmpty } from 'utils/is-empty';
 import { ThoughtMetadataModel } from 'features/thoughts/thought.model';
 import * as Thought from 'features/thoughts';
-import { DateUnit, getDateDiffIn, prettyDiffDate } from 'utils/date';
+import { DateUnit, getDateDiffIn, prettyDiffDate, isObjectEmpty } from 'utils';
 import { api } from 'services/http';
 
 export function ThoughtMetadata() {

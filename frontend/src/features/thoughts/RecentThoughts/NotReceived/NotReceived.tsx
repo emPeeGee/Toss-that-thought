@@ -1,7 +1,7 @@
-import { ThoughtMetadataModel } from 'features/thoughts/thought.model';
+import React from 'react';
 import { Anchor, Button, Group, Mark, Text, Timeline, Title } from '@mantine/core';
 import { Link } from 'react-router-dom';
-import React from 'react';
+import { ThoughtMetadataModel } from 'features/thoughts/thought.model';
 
 export type NotReceivedComponent = React.FC<{ thoughts: ThoughtMetadataModel[] }>;
 

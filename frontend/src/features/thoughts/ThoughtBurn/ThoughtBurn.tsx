@@ -12,7 +12,7 @@ import { useForm } from 'react-hook-form';
 import { ArrowBackUp, Bolt, Lock } from 'tabler-icons-react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { api } from 'services/http';
-import { prettyDiffDate } from 'utils/date';
+import { prettyDiffDate } from 'utils';
 import { ThoughtPassphraseRequest, ThoughtMetadataModel } from '../thought.model';
 
 export function ThoughtBurn() {

@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { MoonStars, Sun } from 'tabler-icons-react';
 import { ActionIcon, Text, useMantineColorScheme } from '@mantine/core';
 
-import { UserContext, tokenIdentifier } from 'features/authentication/';
+import { UserContext } from 'features/authentication/';
 import { Anchor } from 'components';
 import logo from 'assets/logo.svg';
 import {
@@ -28,7 +28,6 @@ export function Header() {
     console.log('Logout');
     userContext?.setUser(null);
     userContext?.setToken(null);
-    localStorage.removeItem(tokenIdentifier);
   };
 
   return (

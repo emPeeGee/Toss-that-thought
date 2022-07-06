@@ -3,12 +3,7 @@ import { Button, Container, LoadingOverlay, PasswordInput, TextInput, Title } fr
 import { ArrowBackUp, Bolt, Lock, UserCircle } from 'tabler-icons-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import {
-  AuthenticationResponse,
-  CredentialsModel,
-  UserContext,
-  tokenIdentifier
-} from 'features/authentication';
+import { AuthenticationResponse, CredentialsModel, UserContext } from 'features/authentication';
 import { api } from 'services/http';
 
 export function SignIn() {
@@ -41,7 +36,6 @@ export function SignIn() {
         auth: true
       })
       .then((response) => {
-        localStorage.setItem(tokenIdentifier, response.token);
         userContext?.setToken(response.token);
       })
       .catch((err) => {
