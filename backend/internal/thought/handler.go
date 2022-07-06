@@ -58,9 +58,11 @@ func (h *handler) create(c *gin.Context) {
 	}
 
 	// TODO: Future, to make a validator for this https://github.com/go-playground/validator/issues/494
-	maxLifetime := time.Now().AddDate(0, 0, 7)
-	if input.Lifetime.After(maxLifetime) {
-		flaw.BadRequest(c, "lifetime cannot be so long", "lifetime cannot be more that 7 days")
+	// TODO: since frontend generate times on start, and if date is small, in can create lifetime in past
+	maxLifetime := time.Now().UTC().AddDate(0, 0, 7)
+	minLifetime := time.Now().UTC().Add(-1 * time.Minute)
+	if input.Lifetime.Before(minLifetime) || input.Lifetime.After(maxLifetime) {
+		flaw.BadRequest(c, "lifetime should be more than 1 minutes from now or 7 days", "lifetime cannot be more that 7 days or less than 1 minutes")
 		return
 	}
 
@@ -174,5 +176,3 @@ func (h *handler) getThoughtsMetadataByUser(c *gin.Context) {
 
 	c.JSON(http.StatusOK, thoughtsMetadata)
 }
-
-// TODO: validate min date of lifetime

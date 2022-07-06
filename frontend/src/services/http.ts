@@ -23,7 +23,6 @@ async function handleErrors<T>(response: Response): Promise<T> {
   return (await response.json()) as T;
 }
 
-// TODO: To check if this approach is good
 export const api = {
   get: <K>({ url, token }: GetRequest) =>
     fetch(`${testUrl}${url}`, {

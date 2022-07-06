@@ -147,8 +147,7 @@ func (r *repository) GetThoughtsMetadataByUser(userId uint) ([]MetadataResponse,
 		return nil, err
 	}
 
-	// TODO: .Where("current_timestamp() > lifetime") ????
-	if err := r.db.Model(&user).Order("created_date asc").Association("Thoughts").Find(&thoughtsMetadata); err != nil {
+	if err := r.db.Model(&user).Order("created_date asc").Association("Thoughts").Find(&thoughtsMetadata, "lifetime > current_timestamp"); err != nil {
 		return nil, err
 	}
 
